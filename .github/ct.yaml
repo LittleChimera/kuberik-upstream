@@ -1,0 +1,8 @@
+# Configuration for helm/chart-testing.
+# Used by ci.yaml's helm job (added when chart-testing is wired in).
+chart-dirs:
+  - chart
+chart-repos:
+  - bitnami=https://charts.bitnami.com/bitnami
+helm-extra-args: --timeout 600s
+target-branch: main

@@ -1,0 +1,18 @@
+# Patterns to ignore when packaging the kuberik chart.
+# https://helm.sh/docs/chart_template_guide/helm_ignore/
+
+# Common
+*.swp
+*.bak
+*.tmp
+*.orig
+*~
+.DS_Store
+
+# Local working
+.git/
+.idea/
+.vscode/
+
+# Chart-relative noise that does not need to ship in the package
+samples/
