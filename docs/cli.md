@@ -1,0 +1,123 @@
+# Kuberik CLI
+
+The `kuberik` CLI is a small wrapper around `kubectl` that streamlines installing Kuberik, inspecting Kuberik resources, and operating common day-2 actions like approving gates.
+
+## Install
+
+### Homebrew
+
+```bash
+brew install kuberik/tap/kuberik
+```
+
+### Binary release
+
+Download an archive for your OS/arch from [Releases](https://github.com/kuberik/kuberik/releases/latest):
+
+```bash
+curl -L -o kuberik.tar.gz \
+  https://github.com/kuberik/kuberik/releases/latest/download/kuberik_$(uname -s | tr A-Z a-z)_amd64.tar.gz
+tar xzf kuberik.tar.gz
+sudo install kuberik /usr/local/bin/
+```
+
+### Container image
+
+```bash
+docker run --rm ghcr.io/kuberik/kuberik-cli:latest version
+```
+
+The container includes both `kuberik` and `kubectl`, so it works in CI without extra setup.
+
+### From source
+
+```bash
+git clone https://github.com/kuberik/kuberik.git
+cd kuberik
+make build
+sudo install bin/kuberik /usr/local/bin/
+```
+
+## Global flags
+
+| Flag | Description |
+|---|---|
+| `--kubeconfig` | Path to a kubeconfig file. Defaults to `$KUBECONFIG` or `~/.kube/config`. |
+| `-n, --namespace` | Kubernetes namespace. Defaults to `default`. |
+| `-v, --version` | Print version and exit. |
+
+## Commands
+
+### `kuberik install`
+
+Install Kuberik on the cluster the current kubeconfig points at.
+
+```bash
+# Core controller only
+kuberik install
+
+# Core + all integration controllers
+kuberik install --all
+```
+
+### `kuberik uninstall`
+
+Remove the bundled Kuberik components from the cluster.
+
+```bash
+kuberik uninstall
+```
+
+### `kuberik check`
+
+Verify Kuberik CRDs and the rollout-controller pod are present.
+
+```bash
+kuberik check
+```
+
+### `kuberik get`
+
+Inspect Kuberik resources. Wraps `kubectl get` with the right resource kinds.
+
+```bash
+kuberik get rollouts            # in default namespace
+kuberik get gates -A            # across all namespaces
+kuberik get healthchecks -n production
+```
+
+### `kuberik approve` / `kuberik reject`
+
+Flip a RolloutGate's `spec.passing` field.
+
+```bash
+kuberik approve my-app-approval -n production
+kuberik reject  my-app-approval -n production
+```
+
+### `kuberik completion`
+
+Print a shell completion script.
+
+```bash
+# Bash
+source <(kuberik completion bash)
+
+# Zsh
+kuberik completion zsh > "${fpath[1]}/_kuberik"
+
+# Fish
+kuberik completion fish | source
+
+# PowerShell
+kuberik completion powershell | Out-String | Invoke-Expression
+```
+
+## Use in CI
+
+The [Kuberik GitHub Action](../action/README.md) installs the CLI on a runner:
+
+```yaml
+- uses: kuberik/kuberik/action@main
+- run: kuberik approve my-app-approval -n production
+```

@@ -108,6 +108,8 @@ Full documentation at [kuberik.com/docs](https://kuberik.com/docs/).
 Docs also available in this repo:
 
 - [Getting Started](docs/getting-started.md)
+- [Installation](docs/installation.md)
+- [CLI Reference](docs/cli.md)
 - [Architecture](docs/architecture.md)
 - [Concepts](docs/concepts.md)
 - [Examples](examples/) - copy-pasteable manifests for common setups
