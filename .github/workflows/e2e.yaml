@@ -1,0 +1,57 @@
+name: e2e
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  cli-on-kind:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build kuberik CLI
+        run: go build -o bin/kuberik ./cmd/kuberik
+
+      - name: Add CLI to PATH
+        run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
+
+      - name: Print CLI version
+        run: kuberik version
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: kuberik-e2e
+
+      - name: Install Flux (image-reflector required by rollout-controller)
+        run: |
+          curl -s https://fluxcd.io/install.sh | sudo bash
+          flux install \
+            --components=source-controller,kustomize-controller,image-reflector-controller \
+            --network-policy=false
+
+      - name: Install Kuberik via CLI
+        run: kuberik install
+
+      - name: Check Kuberik
+        run: |
+          # Give the controller a moment to come up
+          kubectl wait --for=condition=Available --timeout=120s \
+            deployment -n kuberik-system -l app.kubernetes.io/name=rollout-controller || true
+          kuberik check
+
+      - name: Smoke test get commands
+        run: |
+          kuberik get rollouts -A
+          kuberik get gates -A
+          kuberik get healthchecks -A

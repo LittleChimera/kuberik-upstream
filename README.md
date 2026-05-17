@@ -123,6 +123,7 @@ Docs also available in this repo:
 - [Concepts](docs/concepts.md)
 - [Gates](docs/gates.md) - controlling when rollouts proceed
 - [Health Checks](docs/healthchecks.md) - bake-period validation signals
+- [Troubleshooting](docs/troubleshooting.md) - common issues and fixes
 - [Examples](examples/) - copy-pasteable manifests for common setups
 
 ## Community and Contributing
