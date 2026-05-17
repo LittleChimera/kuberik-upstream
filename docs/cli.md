@@ -128,6 +128,16 @@ kuberik logs --tail 500
 kuberik logs -f         # follow
 ```
 
+### `kuberik events`
+
+Show Kubernetes events whose involved object is a Kuberik resource (Rollout, RolloutGate, HealthCheck, RolloutSchedule). Useful for diagnosing stuck rollouts.
+
+```bash
+kuberik events -n production
+kuberik events -A
+kuberik events -w        # stream
+```
+
 ### `kuberik completion`
 
 Print a shell completion script.
