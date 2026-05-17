@@ -98,9 +98,12 @@ jobs:
         with:
           cluster_name: kuberik-helm
       - name: Install chart with defaults
+        # Use --create-namespace and disable the chart's namespace template
+        # so the two do not collide.
         run: |
           helm install kuberik chart/kuberik \
             --namespace kuberik-system --create-namespace \
+            --set createNamespace=false \
             --wait --timeout 3m
       - name: Verify rollout-controller is Available
         run: |

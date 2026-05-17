@@ -1,7 +1,12 @@
 # Default values for the kuberik Helm chart.
 
-# Namespace where the rollout-controller is installed. Pre-created if missing.
+# Namespace where the rollout-controller is installed.
 namespace: kuberik-system
+
+# Have the chart emit the Namespace manifest. Set to false if you use
+# `helm install --create-namespace` (helm owns the namespace then) or
+# if the namespace is managed outside the chart.
+createNamespace: true
 
 # Core rollout-controller settings. Always installed.
 rolloutController:
