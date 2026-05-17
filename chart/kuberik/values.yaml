@@ -1,0 +1,51 @@
+# Default values for the kuberik Helm chart.
+
+# Namespace where the rollout-controller is installed. Pre-created if missing.
+namespace: kuberik-system
+
+# Core rollout-controller settings. Always installed.
+rolloutController:
+  enabled: true
+  image:
+    repository: ghcr.io/kuberik/rollout-controller
+    # Defaults to the chart's appVersion when empty.
+    tag: ""
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      memory: 256Mi
+  serviceAccount:
+    name: rollout-controller
+    annotations: {}
+  replicas: 1
+  logLevel: info
+
+# Optional integration controllers. Enable the ones you need.
+integrations:
+  datadog:
+    enabled: false
+  prometheus:
+    enabled: false
+  openkruise:
+    enabled: false
+  environment:
+    enabled: false
+
+# Optional dashboard.
+dashboard:
+  enabled: false
+
+# Common pod settings applied to all controllers.
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+  fsGroup: 65534
+  seccompProfile:
+    type: RuntimeDefault
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

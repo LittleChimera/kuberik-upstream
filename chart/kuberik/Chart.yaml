@@ -1,0 +1,20 @@
+apiVersion: v2
+name: kuberik
+description: Kubernetes-native progressive delivery. Installs the Kuberik rollout-controller and optional integration controllers.
+type: application
+version: 0.1.0
+appVersion: "0.7.0"
+home: https://kuberik.com
+sources:
+  - https://github.com/kuberik/kuberik
+  - https://github.com/kuberik/rollout-controller
+maintainers:
+  - name: kuberik-maintainers
+    url: https://github.com/kuberik/kuberik/blob/main/MAINTAINERS
+keywords:
+  - kubernetes
+  - gitops
+  - progressive-delivery
+  - continuous-delivery
+  - rollout
+icon: https://raw.githubusercontent.com/kuberik/kuberik/main/logo.svg
