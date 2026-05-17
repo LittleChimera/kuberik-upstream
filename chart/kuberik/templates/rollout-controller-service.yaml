@@ -1,0 +1,21 @@
+{{- if .Values.rolloutController.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: rollout-controller-metrics
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kuberik.labels" . | nindent 4 }}
+    app.kubernetes.io/component: rollout-controller
+    control-plane: controller-manager
+spec:
+  type: ClusterIP
+  ports:
+    - name: https
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
+  selector:
+    app.kubernetes.io/name: rollout-controller
+    control-plane: controller-manager
+{{- end }}
