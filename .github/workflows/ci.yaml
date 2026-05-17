@@ -1,0 +1,55 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Verify go.mod is tidy
+        run: |
+          go mod tidy
+          git diff --exit-code
+      - name: Vet
+        run: go vet ./...
+      - name: Build
+        run: go build -v ./...
+      - name: Test
+        run: go test -race -coverprofile=coverage.txt ./...
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+
+  manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup kustomize
+        uses: imranismail/setup-kustomize@v2
+      - name: Build install manifest
+        run: kustomize build config/install > /tmp/install.yaml
+      - name: Validate YAML
+        run: |
+          test -s /tmp/install.yaml
+          head -50 /tmp/install.yaml
