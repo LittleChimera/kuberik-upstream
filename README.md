@@ -6,6 +6,7 @@
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Go Version](https://img.shields.io/badge/go-1.24-blue.svg)](https://golang.org/)
+[![CI](https://github.com/kuberik/kuberik/actions/workflows/ci.yaml/badge.svg)](https://github.com/kuberik/kuberik/actions/workflows/ci.yaml)
 [![GitHub release](https://img.shields.io/github/v/release/kuberik/rollout-controller?label=latest%20release)](https://github.com/kuberik/rollout-controller/releases/latest)
 [![kuberik.com](https://img.shields.io/badge/docs-kuberik.com-informational)](https://kuberik.com)
 [![GitHub Stars](https://img.shields.io/github/stars/kuberik/kuberik?style=social)](https://github.com/kuberik/kuberik/stargazers)
@@ -26,19 +27,44 @@ Kuberik is declarative, multi-stage progressive delivery for Kubernetes - from c
 
 ## Install
 
-Install the core controller only:
+### CLI
+
+Homebrew:
 
 ```bash
+brew install kuberik/tap/kuberik
+```
+
+Or download a release binary for Linux, macOS, or Windows from [Releases](https://github.com/kuberik/kuberik/releases/latest).
+
+### Cluster (core controller only)
+
+```bash
+kuberik install
+# or
 kubectl apply -f https://github.com/kuberik/rollout-controller/releases/latest/download/install.yaml
 ```
 
-Install everything (core + all integrations):
+### Cluster (core + all integration controllers)
 
 ```bash
+kuberik install --all
+# or
 kubectl apply -k https://github.com/kuberik/kuberik/config/install
 ```
 
 See [Getting Started](docs/getting-started.md) for a step-by-step walkthrough and [Installation](https://kuberik.com/docs/installation/) for per-component install commands.
+
+### GitHub Actions
+
+```yaml
+- uses: kuberik/kuberik/action@main
+  with:
+    version: 'latest'
+- run: kuberik version
+```
+
+See the [Action README](action/README.md) for more examples.
 
 ## Architecture
 
@@ -84,10 +110,15 @@ Docs also available in this repo:
 - [Getting Started](docs/getting-started.md)
 - [Architecture](docs/architecture.md)
 - [Concepts](docs/concepts.md)
+- [Examples](examples/) - copy-pasteable manifests for common setups
 
 ## Community and Contributing
 
 - [CONTRIBUTING.md](CONTRIBUTING.md) - how to contribute
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) - community standards
+- [ROADMAP.md](ROADMAP.md) - upcoming themes
+- [ADOPTERS.md](ADOPTERS.md) - who uses Kuberik
+- [RFCs](rfcs/README.md) - design proposal process
 - [SECURITY.md](SECURITY.md) - reporting vulnerabilities
 - [GitHub Discussions](https://github.com/kuberik/kuberik/discussions) - questions and ideas
 - File bugs and feature requests via [GitHub Issues](https://github.com/kuberik/kuberik/issues)
