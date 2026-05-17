@@ -1,0 +1,35 @@
+# Multi-environment promotion: production only goes after staging.
+#
+# environment-controller watches Environment resources, manages the
+# After/Parallel relationships, and creates RolloutGates that block
+# the downstream Rollout until upstream environments have deployed.
+#
+# Requires environment-controller installed.
+---
+apiVersion: kuberik.com/v1alpha1
+kind: Environment
+metadata:
+  name: staging
+  namespace: staging
+spec:
+  rolloutRef:
+    name: my-app
+  github:
+    repository: myorg/my-app
+    environment: staging
+---
+apiVersion: kuberik.com/v1alpha1
+kind: Environment
+metadata:
+  name: production
+  namespace: production
+spec:
+  rolloutRef:
+    name: my-app
+  github:
+    repository: myorg/my-app
+    environment: production
+  # Production proceeds only after this Environment has deployed.
+  after:
+    - name: staging
+      namespace: staging
