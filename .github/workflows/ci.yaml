@@ -84,3 +84,30 @@ jobs:
         run: |
           test -s /tmp/kuberik-default.yaml
           test -s /tmp/kuberik-all.yaml
+
+  helm-install-kind:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.3
+      - name: Create kind cluster
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: kuberik-helm
+      - name: Install chart with defaults
+        run: |
+          helm install kuberik chart/kuberik \
+            --namespace kuberik-system --create-namespace \
+            --wait --timeout 3m
+      - name: Verify rollout-controller is Available
+        run: |
+          kubectl wait --for=condition=Available --timeout=120s \
+            -n kuberik-system deployment -l app.kubernetes.io/name=rollout-controller
+      - name: Show installed resources
+        if: always()
+        run: |
+          kubectl get all -n kuberik-system
+          kubectl get crd | grep kuberik
