@@ -44,6 +44,12 @@ Homebrew:
 brew install kuberik/tap/kuberik
 ```
 
+`curl | bash` (Linux, macOS):
+
+```bash
+curl -s https://raw.githubusercontent.com/kuberik/kuberik/main/install/install.sh | sudo bash
+```
+
 Or download a release binary for Linux, macOS, or Windows from [Releases](https://github.com/kuberik/kuberik/releases/latest).
 
 ### Cluster (core controller only)
