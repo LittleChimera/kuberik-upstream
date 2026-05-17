@@ -1,0 +1,22 @@
+version: 2
+
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    labels: ["area/ci", "dependencies"]
+    groups:
+      ci:
+        patterns:
+          - "*"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "gomod"
+    directory: "/"
+    labels: ["area/cli", "dependencies"]
+    groups:
+      go:
+        patterns:
+          - "*"
+    schedule:
+      interval: "weekly"
