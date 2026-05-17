@@ -7,5 +7,6 @@ Copy-pasteable manifests showing common Kuberik configurations. Each subdirector
 | [basic-rollout](basic-rollout) | A minimal Rollout tracking one image with a bake period |
 | [with-gate](with-gate) | Adding a manual approval gate to a Rollout |
 | [with-schedule](with-schedule) | Business-hours-only promotions and holiday change freezes |
+| [with-datadog](with-datadog) | A Datadog monitor that gates the bake period via a HealthCheck |
 
 Full conceptual docs at [kuberik.com/docs](https://kuberik.com/docs/).

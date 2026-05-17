@@ -1,0 +1,28 @@
+# A DatadogMonitor annotated for Kuberik. The datadog-controller will
+# create and keep a HealthCheck in sync with this monitor's status.
+#
+# Requires:
+#   - datadog-controller installed (kubectl apply -k https://github.com/kuberik/kuberik/config/install)
+#   - Datadog Operator + DatadogMonitor CRDs installed
+#   - Datadog API key configured for the Datadog operator
+---
+apiVersion: datadoghq.com/v1alpha1
+kind: DatadogMonitor
+metadata:
+  name: my-app-error-rate
+  namespace: production
+  annotations:
+    kuberik.com/health-check: "true"
+spec:
+  type: query alert
+  name: my-app error rate above 1%
+  query: |
+    avg(last_5m):sum:trace.http.request.errors{service:my-app}.as_count() /
+    sum:trace.http.request.hits{service:my-app}.as_count() > 0.01
+  message: |
+    @kuberik-rollouts
+    my-app error rate has exceeded 1% over the last 5 minutes.
+  tags:
+    - service:my-app
+    - env:production
+    - kuberik:rollout-gate
