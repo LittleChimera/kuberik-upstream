@@ -130,6 +130,8 @@ Docs also available in this repo:
 - [API Reference](docs/api.md) - CRDs, annotations, status fields
 - [Gates](docs/gates.md) - controlling when rollouts proceed
 - [Health Checks](docs/healthchecks.md) - bake-period validation signals
+- [Metrics](docs/metrics.md) - controller metrics and suggested alerts
+- [Migration Guide](docs/migration.md) - from Argo Rollouts, Flagger, or kubectl apply
 - [Troubleshooting](docs/troubleshooting.md) - common issues and fixes
 - [Examples](examples/) - copy-pasteable manifests for common setups
 
