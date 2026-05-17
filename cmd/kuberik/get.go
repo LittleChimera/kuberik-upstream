@@ -19,7 +19,7 @@ var getRolloutsCmd = &cobra.Command{
 		if err := requireKubectl(); err != nil {
 			return err
 		}
-		return kubectl(append(scope(), "get", "rollouts.kuberik.com")...).Run()
+		return kubectl(append([]string{"get", "rollouts.kuberik.com"}, scope()...)...).Run()
 	},
 }
 
@@ -31,7 +31,7 @@ var getGatesCmd = &cobra.Command{
 		if err := requireKubectl(); err != nil {
 			return err
 		}
-		return kubectl(append(scope(), "get", "rolloutgates.kuberik.com")...).Run()
+		return kubectl(append([]string{"get", "rolloutgates.kuberik.com"}, scope()...)...).Run()
 	},
 }
 
@@ -43,7 +43,7 @@ var getHealthChecksCmd = &cobra.Command{
 		if err := requireKubectl(); err != nil {
 			return err
 		}
-		return kubectl(append(scope(), "get", "healthchecks.kuberik.com")...).Run()
+		return kubectl(append([]string{"get", "healthchecks.kuberik.com"}, scope()...)...).Run()
 	},
 }
 
