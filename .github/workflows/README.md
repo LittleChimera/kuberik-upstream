@@ -9,6 +9,7 @@ Reference for every workflow in this directory.
 | `codeql.yaml` | push, PR, weekly | CodeQL static analysis of Go source |
 | `scorecard.yaml` | push to main, weekly | OpenSSF Scorecard security posture analysis |
 | `trivy.yaml` | push, Dockerfile/go.mod PRs, weekly | Trivy filesystem vuln scan, SARIF to code-scanning |
+| `lint-docs.yaml` | push, PR touching `**.md` | markdownlint-cli2 against the configured rules |
 | `release.yaml` | push of `v*` tag | Goreleaser run: CLI binaries, Homebrew formula, ghcr.io images |
 | `sync-labels.yaml` | push to main touching `labels.yaml` | Apply `.github/labels.yaml` to issue/PR label set |
 | `stale.yaml` | daily cron | Mark and close inactive issues / PRs |
