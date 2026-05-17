@@ -1,0 +1,20 @@
+# Restrict promotions to business hours, weekdays only.
+#
+# `action: Allow` means the gate is open during the window and closed
+# outside it - so promotions happen only between 9am and 5pm Eastern,
+# Monday through Friday.
+---
+apiVersion: kuberik.com/v1alpha1
+kind: RolloutSchedule
+metadata:
+  name: business-hours-only
+  namespace: production
+spec:
+  rolloutRef:
+    name: my-app
+  action: Allow
+  schedule:
+    - days: [Mon, Tue, Wed, Thu, Fri]
+      start: "09:00"
+      end: "17:00"
+      timezone: "America/New_York"

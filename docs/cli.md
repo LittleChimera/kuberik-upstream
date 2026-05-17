@@ -95,6 +95,29 @@ kuberik approve my-app-approval -n production
 kuberik reject  my-app-approval -n production
 ```
 
+### `kuberik suspend` / `kuberik resume`
+
+Pause and resume a Rollout. While suspended, no new release is patched onto the target resource even if all gates pass.
+
+```bash
+kuberik suspend my-app -n production
+kuberik resume  my-app -n production
+```
+
+Suspension is recorded as the `rollout.kuberik.com/suspended` annotation, so you can also flip it with `kubectl annotate`.
+
+### `kuberik describe`
+
+Describe a Kuberik resource by short kind name.
+
+```bash
+kuberik describe rollout my-app -n production
+kuberik describe gate my-app-approval -n production
+kuberik describe healthcheck my-app-error-rate -n production
+```
+
+Equivalent to `kubectl describe <kind>.kuberik.com <name>` but lets you use the short kind names (`rollout`, `gate`, `healthcheck`, `schedule`).
+
 ### `kuberik completion`
 
 Print a shell completion script.

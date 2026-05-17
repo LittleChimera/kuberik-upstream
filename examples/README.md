@@ -6,5 +6,6 @@ Copy-pasteable manifests showing common Kuberik configurations. Each subdirector
 |---|---|
 | [basic-rollout](basic-rollout) | A minimal Rollout tracking one image with a bake period |
 | [with-gate](with-gate) | Adding a manual approval gate to a Rollout |
+| [with-schedule](with-schedule) | Business-hours-only promotions and holiday change freezes |
 
 Full conceptual docs at [kuberik.com/docs](https://kuberik.com/docs/).
