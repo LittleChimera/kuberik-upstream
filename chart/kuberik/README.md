@@ -4,10 +4,14 @@ A Helm chart that installs the Kuberik rollout-controller and optionally the int
 
 The chart installs:
 
-- The 5 Kuberik CRDs (from `crds/` so Helm applies them before any template).
-- The rollout-controller: ServiceAccount, leader-election Role/RoleBinding, 10 ClusterRoles and 2 ClusterRoleBindings, metrics Service, and Deployment.
-
-Integration controllers (datadog, prometheus, openkruise, environment) and the dashboard have toggles in `values.yaml`. Their workload templates are planned - until then, enabling a toggle prints the matching `kubectl apply` line in the post-install NOTES.
+- 7 CRDs (in `crds/` so Helm applies them before any template): Kuberik core + openkruise + environment.
+- rollout-controller: ServiceAccount, leader-election Role/RoleBinding, 10 ClusterRoles and 2 ClusterRoleBindings, metrics Service, Deployment.
+- Optional integration controllers (toggle in `values.yaml`):
+  - **datadog-controller** - templated
+  - **openkruise-controller** - templated
+  - **environment-controller** - templated
+  - **prometheus-controller** - no upstream release yet; NOTES tells you to build from source
+- Dashboard toggle prints the kubectl apply line in NOTES until templates are added.
 
 ## Install
 
@@ -58,7 +62,19 @@ kubectl delete crd \
   rolloutgates.kuberik.com \
   healthchecks.kuberik.com \
   rolloutschedules.kuberik.com \
-  clusterrolloutschedules.kuberik.com
+  clusterrolloutschedules.kuberik.com \
+  rollouttests.rollout.kuberik.com \
+  environments.environments.kuberik.com
 ```
 
-This also deletes every `Rollout`, `RolloutGate`, and `HealthCheck` in the cluster.
+This also deletes every `Rollout`, `RolloutGate`, `HealthCheck`, `RolloutTest`, and `Environment` in the cluster.
+
+## Enabling everything
+
+```bash
+helm install kuberik ./chart/kuberik \
+  --namespace kuberik-system --create-namespace \
+  --set integrations.datadog.enabled=true \
+  --set integrations.openkruise.enabled=true \
+  --set integrations.environment.enabled=true
+```

@@ -34,16 +34,26 @@ Next steps:
 Docs:  https://kuberik.com/docs/
 Repo:  https://github.com/kuberik/kuberik
 
-{{- $enabled := list }}
-{{- if .Values.integrations.datadog.enabled }}{{ $enabled = append $enabled "datadog" }}{{ end }}
-{{- if .Values.integrations.prometheus.enabled }}{{ $enabled = append $enabled "prometheus" }}{{ end }}
-{{- if .Values.integrations.openkruise.enabled }}{{ $enabled = append $enabled "openkruise" }}{{ end }}
-{{- if .Values.integrations.environment.enabled }}{{ $enabled = append $enabled "environment" }}{{ end }}
-{{- if $enabled }}
+{{- $templated := list }}
+{{- if .Values.integrations.datadog.enabled }}{{ $templated = append $templated "datadog-controller" }}{{ end }}
+{{- if .Values.integrations.openkruise.enabled }}{{ $templated = append $templated "openkruise-controller" }}{{ end }}
+{{- if .Values.integrations.environment.enabled }}{{ $templated = append $templated "environment-controller" }}{{ end }}
+{{- if $templated }}
 
-The following integration controllers were toggled on, but the chart does not
-yet template their workloads. For now install them separately:
+Integration controllers installed: {{ join ", " $templated }}.
+{{- end }}
 
-{{ range $enabled }}    kubectl apply -f https://github.com/kuberik/{{ . }}-controller/releases/latest/download/install.yaml
-{{ end }}
+{{- if .Values.integrations.prometheus.enabled }}
+
+prometheus-controller has no published release yet. Build and apply from source:
+
+    git clone https://github.com/kuberik/prometheus-controller && cd prometheus-controller && make deploy
+{{- end }}
+
+{{- if .Values.dashboard.enabled }}
+
+The rollout-dashboard template is not yet bundled in this chart. Install it
+separately:
+
+    kubectl apply -f https://github.com/kuberik/rollout-dashboard/releases/latest/download/install.yaml
 {{- end }}
