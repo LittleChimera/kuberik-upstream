@@ -1,0 +1,29 @@
+{{- if .Values.rolloutController.enabled }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "kuberik.fullname" . }}-test-ready"
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kuberik.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  serviceAccountName: {{ default "default" .Values.tests.serviceAccountName }}
+  containers:
+    - name: kubectl
+      image: bitnami/kubectl:1.31
+      command:
+        - kubectl
+      args:
+        - wait
+        - --for=condition=Available
+        - --timeout=120s
+        - -n
+        - {{ .Values.namespace }}
+        - deployment
+        - -l
+        - app.kubernetes.io/name=rollout-controller
+{{- end }}
