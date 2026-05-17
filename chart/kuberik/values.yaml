@@ -22,6 +22,23 @@ rolloutController:
     annotations: {}
   replicas: 1
   logLevel: info
+  podDisruptionBudget:
+    # Only emitted when enabled AND replicas > 1. Provide either
+    # minAvailable or maxUnavailable; if both unset, defaults to
+    # minAvailable: 1.
+    enabled: false
+    minAvailable: ""
+    maxUnavailable: ""
+
+# Prometheus Operator ServiceMonitor for scraping controller metrics.
+metrics:
+  serviceMonitor:
+    enabled: false
+    # Namespace where the ServiceMonitor is created; defaults to .Values.namespace.
+    namespace: ""
+    interval: 30s
+    scrapeTimeout: 10s
+    labels: {}
 
 # Optional integration controllers. Enable the ones you need.
 integrations:

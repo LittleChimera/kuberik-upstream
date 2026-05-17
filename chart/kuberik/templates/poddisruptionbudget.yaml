@@ -1,0 +1,21 @@
+{{- if and .Values.rolloutController.podDisruptionBudget.enabled (gt (int .Values.rolloutController.replicas) 1) }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: rollout-controller
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kuberik.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.rolloutController.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.rolloutController.podDisruptionBudget.minAvailable }}
+  {{- else if .Values.rolloutController.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.rolloutController.podDisruptionBudget.maxUnavailable }}
+  {{- else }}
+  minAvailable: 1
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rollout-controller
+      control-plane: controller-manager
+{{- end }}

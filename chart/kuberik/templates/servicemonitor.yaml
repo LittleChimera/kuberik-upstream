@@ -1,0 +1,28 @@
+{{- if and .Values.metrics.serviceMonitor.enabled .Values.rolloutController.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: rollout-controller
+  namespace: {{ default .Values.namespace .Values.metrics.serviceMonitor.namespace }}
+  labels:
+    {{- include "kuberik.labels" . | nindent 4 }}
+    {{- with .Values.metrics.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rollout-controller
+      control-plane: controller-manager
+  endpoints:
+    - port: https
+      scheme: https
+      interval: {{ .Values.metrics.serviceMonitor.interval }}
+      scrapeTimeout: {{ .Values.metrics.serviceMonitor.scrapeTimeout }}
+      tlsConfig:
+        insecureSkipVerify: true
+      bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+{{- end }}
