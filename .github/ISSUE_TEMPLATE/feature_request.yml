@@ -1,0 +1,39 @@
+name: Feature Request
+description: Suggest an improvement or new capability
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the use case or gap you are hitting.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What would you like to see? API sketch, UX description, or rough design — anything helps.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What workarounds or other tools have you tried?
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - rollout-controller
+        - rollout-dashboard
+        - datadog-controller
+        - prometheus-controller
+        - environment-controller
+        - openkruise-controller
+        - cloud-controller
+        - docs
+        - other
+    validations:
+      required: true

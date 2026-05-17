@@ -1,0 +1,20 @@
+# Install all Kuberik controllers.
+# kubectl apply -k https://github.com/kuberik/kuberik/config/install
+#
+# To install only the core controller:
+#   kubectl apply -f https://github.com/kuberik/rollout-controller/releases/latest/download/install.yaml
+#
+# To install individual optional controllers, see the resources list below
+# and apply only the URLs you need.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # Core (required)
+  - https://github.com/kuberik/rollout-controller/releases/download/v0.7.0/install.yaml
+
+  # Integrations (optional - comment out what you don't need)
+  - https://github.com/kuberik/openkruise-controller/releases/download/v0.3.3/install.yaml
+  - https://github.com/kuberik/datadog-controller/releases/download/v0.1.0/install.yaml
+  - https://github.com/kuberik/environment-controller/releases/download/v0.1.5/install.yaml

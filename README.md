@@ -1,0 +1,97 @@
+<img src="./logo.svg" height="100" alt="Kuberik" />
+
+# Kuberik
+
+**Kubernetes-native continuous delivery. Safe, hands-off deployments.**
+
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Go Version](https://img.shields.io/badge/go-1.24-blue.svg)](https://golang.org/)
+[![GitHub release](https://img.shields.io/github/v/release/kuberik/rollout-controller?label=latest%20release)](https://github.com/kuberik/rollout-controller/releases/latest)
+[![kuberik.com](https://img.shields.io/badge/docs-kuberik.com-informational)](https://kuberik.com)
+[![GitHub Stars](https://img.shields.io/github/stars/kuberik/kuberik?style=social)](https://github.com/kuberik/kuberik/stargazers)
+
+> If Kuberik saves you from a bad deploy, consider [starring the repo](https://github.com/kuberik/kuberik/stargazers) — it helps others find the project.
+
+Kuberik is declarative, multi-stage progressive delivery for Kubernetes - from commit to production, batteries included. It fills the gap that Flux and ArgoCD leave open: progressive delivery as Kubernetes-native CRDs, with no centralized pipeline, built-in health checks, deployment gates, and bake time - all reconciled by controllers that run in your cluster.
+
+## Features
+
+| Feature | Description |
+|---|---|
+| **Multi-Stage Pipelines** | Promote releases across environments with dependencies between stages. |
+| **Deployment Gates** | Control when and which releases deploy - with schedules, manual approvals, or custom conditions. |
+| **Canary Rollouts** | Gradually roll out changes to a subset of users before full promotion. |
+| **Automated Testing** | Run smoke tests, integration tests, or any verification Job as part of your rollout pipeline. |
+| **Monitoring Integration** | Connect Datadog, Prometheus, or custom metrics to continuously validate deployments. |
+
+## Install
+
+Install the core controller only:
+
+```bash
+kubectl apply -f https://github.com/kuberik/rollout-controller/releases/latest/download/install.yaml
+```
+
+Install everything (core + all integrations):
+
+```bash
+kubectl apply -k https://github.com/kuberik/kuberik/config/install
+```
+
+See [Getting Started](docs/getting-started.md) for a step-by-step walkthrough and [Installation](https://kuberik.com/docs/installation/) for per-component install commands.
+
+## Architecture
+
+```mermaid
+graph TD
+    RC[rollout-controller]
+
+    subgraph Integrations
+        DD[datadog-controller]
+        PROM[prometheus-controller]
+        OK[openkruise-controller]
+        ENV[environment-controller]
+    end
+
+    subgraph Observability
+        DASH[rollout-dashboard]
+    end
+
+    DD -->|HealthCheck| RC
+    PROM -->|HealthCheck| RC
+    OK -->|RolloutStrategy| RC
+    ENV -->|RolloutGate| RC
+    RC -->|status| DASH
+```
+
+## Components
+
+| Component | Purpose |
+|---|---|
+| [rollout-controller](https://github.com/kuberik/rollout-controller) | Core controller. Manages Rollout, RolloutGate, HealthCheck, and RolloutSchedule CRDs. |
+| [rollout-dashboard](https://github.com/kuberik/rollout-dashboard) | Web UI for visualizing rollout status across namespaces. |
+| [datadog-controller](https://github.com/kuberik/datadog-controller) | Creates kuberik HealthCheck resources from DatadogMonitor status. |
+| [environment-controller](https://github.com/kuberik/environment-controller) | Reports deployment status to GitHub Deployments API; manages environment relationships. |
+| [openkruise-controller](https://github.com/kuberik/openkruise-controller) | Integrates OpenKruise advanced rollout strategies with the Kuberik gate system. |
+| [prometheus-controller](https://github.com/kuberik/prometheus-controller) | Creates HealthCheck resources from Prometheus alert and query results. |
+
+## Documentation
+
+Full documentation at [kuberik.com/docs](https://kuberik.com/docs/).
+
+Docs also available in this repo:
+
+- [Getting Started](docs/getting-started.md)
+- [Architecture](docs/architecture.md)
+- [Concepts](docs/concepts.md)
+
+## Community and Contributing
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) - how to contribute
+- [SECURITY.md](SECURITY.md) - reporting vulnerabilities
+- [GitHub Discussions](https://github.com/kuberik/kuberik/discussions) - questions and ideas
+- File bugs and feature requests via [GitHub Issues](https://github.com/kuberik/kuberik/issues)
+
+## License
+
+Apache 2.0 - see [LICENSE](LICENSE).

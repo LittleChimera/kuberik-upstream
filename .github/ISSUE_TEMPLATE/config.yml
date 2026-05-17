@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://kuberik.com/docs/
+    about: Check the docs first — many questions are answered there.
+  - name: GitHub Discussions
+    url: https://github.com/kuberik/kuberik/discussions
+    about: Ask questions and share ideas in Discussions.
