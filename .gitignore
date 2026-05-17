@@ -16,6 +16,7 @@ coverage.txt
 bin/
 dist/
 output/
+/kuberik
 
 # Editor / OS
 .vscode/
