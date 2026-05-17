@@ -24,7 +24,11 @@ tidy:
 # Format Go code.
 .PHONY: fmt
 fmt:
-	go fmt ./...
+	gofmt -s -w cmd
+
+# Combined pre-PR sanity check: tidy, format, vet, test.
+.PHONY: presubmit
+presubmit: tidy fmt vet test
 
 # Run go vet.
 .PHONY: vet
