@@ -1,0 +1,16 @@
+# A Flux OCIRepository that Kuberik will patch with the new tag when a
+# release is promoted. The rollout.kuberik.com/rollout annotation tells
+# the controller which Rollout this resource belongs to.
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: my-app
+  namespace: default
+  annotations:
+    rollout.kuberik.com/rollout: "my-app"
+spec:
+  url: oci://ghcr.io/myorg/my-app
+  interval: 1m
+  ref:
+    tag: "1.0.0"

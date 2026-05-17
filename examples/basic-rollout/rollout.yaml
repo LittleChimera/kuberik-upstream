@@ -1,0 +1,20 @@
+# A minimal Kuberik rollout that tracks releases of a single image and
+# promotes them through a 10-minute bake period.
+#
+# Requires:
+#   - Flux v2 with image-reflector-controller installed
+#   - An ImageRepository + ImagePolicy in the flux-system namespace
+#     watching the same image (see flux-image-tracking.yaml)
+---
+apiVersion: kuberik.com/v1alpha1
+kind: Rollout
+metadata:
+  name: my-app
+  namespace: default
+spec:
+  releasesImagePolicy:
+    name: my-app
+    namespace: flux-system
+  versionHistoryLimit: 10
+  releaseUpdateInterval: 5m
+  bakeTime: 10m
