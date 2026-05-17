@@ -1,0 +1,83 @@
+# OpenSSF Security Insights spec
+# https://github.com/ossf/security-insights-spec/blob/main/specification.md
+header:
+  schema-version: 1.0.0
+  expiration-date: "2027-01-01T00:00:00.000Z"
+  last-updated: "2026-05-17"
+  last-reviewed: "2026-05-17"
+  project-url: https://github.com/kuberik/kuberik
+  project-release: "v0.1.0"
+  changelog: https://github.com/kuberik/kuberik/releases
+  license: https://github.com/kuberik/kuberik/blob/main/LICENSE
+
+project-lifecycle:
+  status: active
+  bug-fixes-only: false
+  core-maintainers:
+    - https://github.com/LittleChimera
+
+contribution-policy:
+  accepts-pull-requests: true
+  accepts-automated-pull-requests: true
+  contributing-policy: https://github.com/kuberik/kuberik/blob/main/CONTRIBUTING.md
+  code-of-conduct: https://github.com/kuberik/kuberik/blob/main/CODE_OF_CONDUCT.md
+
+documentation:
+  - https://kuberik.com/docs/
+
+distribution-points:
+  - https://github.com/kuberik/kuberik/releases
+  - https://ghcr.io/kuberik/kuberik-cli
+
+security-artifacts:
+  threat-model:
+    threat-model-created: false
+  self-assessment:
+    self-assessment-created: false
+
+security-testing:
+  - tool-type: sca
+    tool-name: Dependabot
+    tool-version: "2"
+    integration:
+      ad-hoc: false
+      ci: false
+      before-release: false
+    tool-url: https://github.com/kuberik/kuberik/blob/main/.github/dependabot.yml
+  - tool-type: sast
+    tool-name: CodeQL
+    tool-version: latest
+    integration:
+      ad-hoc: false
+      ci: true
+      before-release: true
+    tool-url: https://github.com/kuberik/kuberik/blob/main/.github/workflows/codeql.yaml
+  - tool-type: sast
+    tool-name: OpenSSF Scorecard
+    tool-version: latest
+    integration:
+      ad-hoc: false
+      ci: true
+      before-release: false
+    tool-url: https://github.com/kuberik/kuberik/blob/main/.github/workflows/scorecard.yaml
+
+security-assessments: []
+
+security-contacts:
+  - type: website
+    value: https://github.com/kuberik/kuberik/security/advisories/new
+    primary: true
+
+vulnerability-reporting:
+  accepts-vulnerability-reports: true
+  email-contact: ""
+  security-policy: https://github.com/kuberik/kuberik/blob/main/SECURITY.md
+  bug-bounty-available: false
+  pgp-key: ""
+
+dependencies:
+  third-party-packages: true
+  dependencies-lists:
+    - https://github.com/kuberik/kuberik/blob/main/go.mod
+  dependencies-lifecycle:
+    policy-url: https://github.com/kuberik/kuberik/blob/main/.github/dependabot.yml
