@@ -1,0 +1,6 @@
+# Exclude everything by default so the image only contains the goreleaser
+# build context (the kuberik binary copied in by the goreleaser docker step).
+*
+
+# Re-include the kuberik binary built by goreleaser (passed via build context).
+!kuberik
