@@ -1,0 +1,71 @@
+# Declarative label configuration for kuberik/kuberik.
+# Ref: https://github.com/EndBug/label-sync#config-files
+
+# Area labels
+- name: area/ci
+  description: CI, GitHub Actions, and release tooling
+  color: '#86efc9'
+- name: area/cli
+  description: Kuberik CLI
+  color: '#1673b6'
+- name: area/install
+  description: Install manifests, Helm chart, kustomize bundle
+  color: '#00b140'
+- name: area/docs
+  description: Documentation
+  color: '#0075ca'
+- name: area/rollout-controller
+  description: Core rollout-controller
+  color: '#c739ff'
+- name: area/rollout-dashboard
+  description: Web dashboard
+  color: '#863faf'
+- name: area/datadog
+  description: Datadog integration
+  color: '#632ca6'
+- name: area/prometheus
+  description: Prometheus integration
+  color: '#e6522c'
+- name: area/openkruise
+  description: OpenKruise integration
+  color: '#1bbac0'
+- name: area/environment
+  description: Environment controller (GitHub Deployments)
+  color: '#24292f'
+- name: area/rfc
+  description: Proposal in RFC format
+  color: '#D621C3'
+
+# Kind labels
+- name: bug
+  description: Something is not working
+  color: '#d73a4a'
+- name: enhancement
+  description: New feature or improvement
+  color: '#a2eeef'
+- name: question
+  description: Further information is requested
+  color: '#d876e3'
+- name: dependencies
+  description: Dependency updates
+  color: '#0366d6'
+- name: good first issue
+  description: Good for newcomers
+  color: '#7057ff'
+- name: help wanted
+  description: Extra attention is needed
+  color: '#008672'
+
+# Status labels
+- name: needs/triage
+  description: Awaiting maintainer triage
+  color: '#fbca04'
+- name: needs/repro
+  description: Cannot reproduce without more info
+  color: '#fbca04'
+- name: blocked
+  description: Blocked by external dependency or decision
+  color: '#b60205'
+- name: stale
+  description: Inactive for a long time
+  color: '#cccccc'

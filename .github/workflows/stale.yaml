@@ -1,0 +1,31 @@
+name: stale
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+permissions: read-all
+jobs:
+  stale:
+    permissions:
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@5bef64f19d7facfb25b37b414482c7164d639639 # v9.1.0
+        with:
+          days-before-issue-stale: 90
+          days-before-issue-close: 14
+          stale-issue-label: stale
+          stale-issue-message: >
+            This issue has been inactive for 90 days. It will be closed in 14 days if no further activity occurs.
+            Comment to keep it open or add a `needs/triage` label.
+          close-issue-message: >
+            Closed due to inactivity. Reopen if this is still relevant.
+          days-before-pr-stale: 60
+          days-before-pr-close: 14
+          stale-pr-label: stale
+          stale-pr-message: >
+            This PR has been inactive for 60 days. It will be closed in 14 days if no further activity occurs.
+          exempt-issue-labels: "blocked,help wanted,good first issue,area/rfc"
+          exempt-pr-labels: "blocked,help wanted"
+          operations-per-run: 100
