@@ -1,0 +1,49 @@
+Kuberik {{ .Chart.AppVersion }} installed in namespace {{ .Values.namespace }}.
+
+{{- if .Values.rolloutController.enabled }}
+
+Verify the rollout-controller is running:
+
+    kubectl get pods -n {{ .Values.namespace }} -l app.kubernetes.io/name=rollout-controller
+
+or, with the kuberik CLI:
+
+    kuberik check
+{{- end }}
+
+Next steps:
+
+  1. Install Flux's image-reflector-controller (Kuberik discovers releases
+     through Flux ImagePolicy):
+
+         flux install --components=source-controller,kustomize-controller,image-reflector-controller
+
+  2. Define an ImageRepository + ImagePolicy for each app you want Kuberik
+     to track.
+
+  3. Create your first Rollout. See:
+
+         https://github.com/kuberik/kuberik/blob/main/examples/basic-rollout/
+
+  4. Inspect:
+
+         kuberik get rollouts -A
+         kuberik get gates -A
+         kuberik get healthchecks -A
+
+Docs:  https://kuberik.com/docs/
+Repo:  https://github.com/kuberik/kuberik
+
+{{- $enabled := list }}
+{{- if .Values.integrations.datadog.enabled }}{{ $enabled = append $enabled "datadog" }}{{ end }}
+{{- if .Values.integrations.prometheus.enabled }}{{ $enabled = append $enabled "prometheus" }}{{ end }}
+{{- if .Values.integrations.openkruise.enabled }}{{ $enabled = append $enabled "openkruise" }}{{ end }}
+{{- if .Values.integrations.environment.enabled }}{{ $enabled = append $enabled "environment" }}{{ end }}
+{{- if $enabled }}
+
+The following integration controllers were toggled on, but the chart does not
+yet template their workloads. For now install them separately:
+
+{{ range $enabled }}    kubectl apply -f https://github.com/kuberik/{{ . }}-controller/releases/latest/download/install.yaml
+{{ end }}
+{{- end }}
