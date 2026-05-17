@@ -118,6 +118,16 @@ kuberik describe healthcheck my-app-error-rate -n production
 
 Equivalent to `kubectl describe <kind>.kuberik.com <name>` but lets you use the short kind names (`rollout`, `gate`, `healthcheck`, `schedule`).
 
+### `kuberik logs`
+
+Stream logs from the rollout-controller pod(s).
+
+```bash
+kuberik logs            # last 100 lines
+kuberik logs --tail 500
+kuberik logs -f         # follow
+```
+
 ### `kuberik completion`
 
 Print a shell completion script.
