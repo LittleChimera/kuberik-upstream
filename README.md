@@ -64,8 +64,14 @@ kubectl apply -f https://github.com/kuberik/rollout-controller/releases/latest/d
 
 ```bash
 kuberik install --all
-# or
+# or, with kustomize
 kubectl apply -k https://github.com/kuberik/kuberik/config/install
+# or, with Helm
+helm install kuberik ./chart/kuberik \
+  --namespace kuberik-system --create-namespace \
+  --set integrations.datadog.enabled=true \
+  --set integrations.openkruise.enabled=true \
+  --set integrations.environment.enabled=true
 ```
 
 See [Getting Started](docs/getting-started.md) for a step-by-step walkthrough and [Installation](https://kuberik.com/docs/installation/) for per-component install commands.
