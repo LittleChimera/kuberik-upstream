@@ -27,12 +27,24 @@ rolloutController:
 integrations:
   datadog:
     enabled: false
+    image:
+      repository: ghcr.io/kuberik/datadog-controller
+      tag: ""  # defaults to the version pinned by the template
   prometheus:
     enabled: false
+    image:
+      repository: ghcr.io/kuberik/prometheus-controller
+      tag: ""
   openkruise:
     enabled: false
+    image:
+      repository: ghcr.io/kuberik/openkruise-controller
+      tag: ""
   environment:
     enabled: false
+    image:
+      repository: ghcr.io/kuberik/environment-controller
+      tag: ""
 
 # Optional dashboard.
 dashboard:
