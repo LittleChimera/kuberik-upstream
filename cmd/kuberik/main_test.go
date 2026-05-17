@@ -8,7 +8,11 @@ import (
 
 // TestRootCommand verifies the root command exposes its subcommands.
 func TestRootCommand(t *testing.T) {
-	want := []string{"version", "install", "uninstall", "check", "get", "approve", "reject", "completion"}
+	want := []string{
+		"version", "install", "uninstall", "check", "get",
+		"approve", "reject", "completion",
+		"suspend", "resume", "describe",
+	}
 	for _, name := range want {
 		if _, _, err := rootCmd.Find([]string{name}); err != nil {
 			t.Errorf("subcommand %q not registered: %v", name, err)
