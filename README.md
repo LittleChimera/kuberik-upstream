@@ -127,6 +127,7 @@ Docs also available in this repo:
 - [CLI Reference](docs/cli.md)
 - [Architecture](docs/architecture.md)
 - [Concepts](docs/concepts.md)
+- [API Reference](docs/api.md) - CRDs, annotations, status fields
 - [Gates](docs/gates.md) - controlling when rollouts proceed
 - [Health Checks](docs/healthchecks.md) - bake-period validation signals
 - [Troubleshooting](docs/troubleshooting.md) - common issues and fixes
