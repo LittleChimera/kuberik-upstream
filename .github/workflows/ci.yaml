@@ -53,3 +53,29 @@ jobs:
         run: |
           test -s /tmp/install.yaml
           head -50 /tmp/install.yaml
+
+  helm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.3
+      - name: Lint chart
+        run: helm lint chart/kuberik
+      - name: Render chart (defaults)
+        run: helm template kuberik chart/kuberik > /tmp/kuberik-default.yaml
+      - name: Render chart (all integrations enabled)
+        run: |
+          helm template kuberik chart/kuberik \
+            --set integrations.datadog.enabled=true \
+            --set integrations.prometheus.enabled=true \
+            --set integrations.openkruise.enabled=true \
+            --set integrations.environment.enabled=true \
+            --set dashboard.enabled=true \
+            > /tmp/kuberik-all.yaml
+      - name: Validate output is non-empty
+        run: |
+          test -s /tmp/kuberik-default.yaml
+          test -s /tmp/kuberik-all.yaml
