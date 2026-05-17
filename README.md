@@ -121,6 +121,8 @@ Docs also available in this repo:
 - [CLI Reference](docs/cli.md)
 - [Architecture](docs/architecture.md)
 - [Concepts](docs/concepts.md)
+- [Gates](docs/gates.md) - controlling when rollouts proceed
+- [Health Checks](docs/healthchecks.md) - bake-period validation signals
 - [Examples](examples/) - copy-pasteable manifests for common setups
 
 ## Community and Contributing
