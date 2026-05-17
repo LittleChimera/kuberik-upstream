@@ -2,7 +2,12 @@
 
 A Helm chart that installs the Kuberik rollout-controller and optionally the integration controllers. Alternative to the [kustomize bundle](../../config/install/kustomization.yaml).
 
-> **Status:** scaffold. The chart currently installs the rollout-controller and exposes toggles for the optional integration controllers. Full integration controller templates and the dashboard are planned - see [ROADMAP.md](../../ROADMAP.md).
+The chart installs:
+
+- The 5 Kuberik CRDs (from `crds/` so Helm applies them before any template).
+- The rollout-controller: ServiceAccount, leader-election Role/RoleBinding, 10 ClusterRoles and 2 ClusterRoleBindings, metrics Service, and Deployment.
+
+Integration controllers (datadog, prometheus, openkruise, environment) and the dashboard have toggles in `values.yaml`. Their workload templates are planned - until then, enabling a toggle prints the matching `kubectl apply` line in the post-install NOTES.
 
 ## Install
 
