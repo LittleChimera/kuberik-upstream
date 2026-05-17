@@ -7,13 +7,22 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Go Version](https://img.shields.io/badge/go-1.24-blue.svg)](https://golang.org/)
 [![CI](https://github.com/kuberik/kuberik/actions/workflows/ci.yaml/badge.svg)](https://github.com/kuberik/kuberik/actions/workflows/ci.yaml)
-[![GitHub release](https://img.shields.io/github/v/release/kuberik/rollout-controller?label=latest%20release)](https://github.com/kuberik/rollout-controller/releases/latest)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/kuberik/kuberik/badge)](https://scorecard.dev/viewer/?uri=github.com/kuberik/kuberik)
+[![GitHub release](https://img.shields.io/github/v/release/kuberik/rollout-controller?label=rollout-controller)](https://github.com/kuberik/rollout-controller/releases/latest)
+[![CLI release](https://img.shields.io/github/v/release/kuberik/kuberik?label=cli)](https://github.com/kuberik/kuberik/releases/latest)
 [![kuberik.com](https://img.shields.io/badge/docs-kuberik.com-informational)](https://kuberik.com)
 [![GitHub Stars](https://img.shields.io/github/stars/kuberik/kuberik?style=social)](https://github.com/kuberik/kuberik/stargazers)
 
 > If Kuberik saves you from a bad deploy, consider [starring the repo](https://github.com/kuberik/kuberik/stargazers) — it helps others find the project.
 
 Kuberik is declarative, multi-stage progressive delivery for Kubernetes - from commit to production, batteries included. It fills the gap that Flux and ArgoCD leave open: progressive delivery as Kubernetes-native CRDs, with no centralized pipeline, built-in health checks, deployment gates, and bake time - all reconciled by controllers that run in your cluster.
+
+## Why Kuberik
+
+- **No pipelines to maintain.** Rollouts are CRDs reconciled by in-cluster controllers. There is no Jenkins, no Tekton DAG, no Argo Workflow to keep alive.
+- **Composes with Flux.** Kuberik does not replace your GitOps engine. It reads Flux `ImagePolicy` to discover releases and patches Flux source/kustomization resources to promote them.
+- **Health and gate signals are decoupled.** Datadog, Prometheus, OpenKruise, GitHub Deployments, and custom controllers all produce `HealthCheck` / `RolloutGate` resources independently - the rollout engine just reads them.
+- **Day-2 tools are first class.** A real CLI, a dashboard, structured controller logs, and a GitHub Action ship in the same release cycle as the controllers themselves.
 
 ## Features
 
