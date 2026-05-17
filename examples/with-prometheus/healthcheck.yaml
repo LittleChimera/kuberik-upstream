@@ -1,0 +1,26 @@
+# A PrometheusHealthCheck resource (from prometheus-controller) that
+# evaluates a PromQL query and writes the result into a Kuberik HealthCheck.
+#
+# Requires:
+#   - prometheus-controller installed
+#   - Prometheus reachable from the prometheus-controller pod
+---
+apiVersion: kuberik.com/v1alpha1
+kind: PrometheusHealthCheck
+metadata:
+  name: my-app-latency
+  namespace: production
+spec:
+  rolloutRef:
+    name: my-app
+  prometheus:
+    url: http://prometheus.monitoring.svc:9090
+  query: |
+    histogram_quantile(0.99,
+      sum(rate(http_request_duration_seconds_bucket{service="my-app"}[5m]))
+      by (le)
+    )
+  # Bake fails if p99 latency goes above 500ms.
+  threshold: 0.5
+  comparison: LessThan
+  interval: 30s
