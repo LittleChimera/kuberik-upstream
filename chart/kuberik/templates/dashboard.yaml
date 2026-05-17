@@ -1,0 +1,126 @@
+{{- if .Values.dashboard.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: rollout-dashboard
+  name: rollout-dashboard
+  namespace: {{ .Values.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: rollout-dashboard
+  name: rollout-dashboard-rollouts-patch
+rules:
+  - apiGroups:
+      - rollouts.kruise.io
+    resources:
+      - rollouts/status
+    verbs:
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: rollout-dashboard
+  name: rollout-dashboard-view
+rules:
+  - apiGroups:
+      - '*'
+    resources:
+      - '*'
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: rollout-dashboard
+  name: rollout-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rollout-controller-manager-role
+subjects:
+  - kind: ServiceAccount
+    name: rollout-dashboard
+    namespace: {{ .Values.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: rollout-dashboard
+  name: rollout-dashboard-rollouts-patch
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rollout-dashboard-rollouts-patch
+subjects:
+  - kind: ServiceAccount
+    name: rollout-dashboard
+    namespace: {{ .Values.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: rollout-dashboard
+  name: rollout-dashboard-view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rollout-dashboard-view
+subjects:
+  - kind: ServiceAccount
+    name: rollout-dashboard
+    namespace: {{ .Values.namespace }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: rollout-dashboard
+  name: rollout-dashboard
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: rollout-dashboard
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: rollout-dashboard
+  name: rollout-dashboard
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rollout-dashboard
+  template:
+    metadata:
+      labels:
+        app: rollout-dashboard
+    spec:
+      containers:
+        - image: {{ printf "%s:%s" .Values.dashboard.image.repository (.Values.dashboard.image.tag | default "v0.7.7") | quote }}
+          name: rollout-dashboard
+          ports:
+            - containerPort: 8080
+      serviceAccountName: rollout-dashboard
+
+---
+
+{{- end }}

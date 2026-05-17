@@ -46,9 +46,12 @@ integrations:
       repository: ghcr.io/kuberik/environment-controller
       tag: ""
 
-# Optional dashboard.
+# Optional dashboard (rollout-dashboard web UI).
 dashboard:
   enabled: false
+  image:
+    repository: ghcr.io/kuberik/rollout-dashboard
+    tag: ""
 
 # Common pod settings applied to all controllers.
 podSecurityContext:

@@ -52,8 +52,7 @@ prometheus-controller has no published release yet. Build and apply from source:
 
 {{- if .Values.dashboard.enabled }}
 
-The rollout-dashboard template is not yet bundled in this chart. Install it
-separately:
+rollout-dashboard installed. Expose it (locally) with:
 
-    kubectl apply -f https://github.com/kuberik/rollout-dashboard/releases/latest/download/install.yaml
+    kubectl port-forward -n {{ .Values.namespace }} svc/rollout-dashboard 8080
 {{- end }}
