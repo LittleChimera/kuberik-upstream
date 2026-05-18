@@ -45,7 +45,7 @@ Different controllers create gates for different reasons. The Rollout does not c
 
 ## Schedule-based gates
 
-A `RolloutSchedule` creates and manages gates on a cron-style schedule:
+A `RolloutSchedule` creates and manages gates on a time-based rule set. Rollouts opt in by carrying a matching label.
 
 ```yaml
 apiVersion: kuberik.com/v1alpha1
@@ -54,19 +54,21 @@ metadata:
   name: business-hours-only
   namespace: production
 spec:
-  rolloutRef:
-    name: my-app
+  rolloutSelector:
+    matchLabels:
+      kuberik.com/schedule: business-hours-only
   action: Allow
-  schedule:
-    - days: [Mon, Tue, Wed, Thu, Fri]
-      start: "09:00"
-      end: "17:00"
-      timezone: "America/New_York"
+  timezone: "America/New_York"
+  rules:
+    - daysOfWeek: [Monday, Tuesday, Wednesday, Thursday, Friday]
+      timeRange:
+        start: "09:00"
+        end: "17:00"
 ```
 
 `action: Allow` means the gate is open during the window and closed outside it. `action: Deny` means the gate is closed during the window (useful for change-freeze windows).
 
-`ClusterRolloutSchedule` is the cluster-scoped variant: it selects target namespaces via a `namespaceSelector` and creates gates in each one.
+`ClusterRolloutSchedule` is the cluster-scoped variant: it adds a `namespaceSelector` so the same rules cover Rollouts in multiple namespaces.
 
 ## Inspecting gate state
 

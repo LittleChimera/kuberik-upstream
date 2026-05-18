@@ -1,22 +1,25 @@
 # A holiday change freeze: block promotions for an entire week.
 #
 # `action: Deny` means the gate is closed during the window and open
-# outside it - so during the holiday window, no Rollout in the
-# production namespace will advance.
+# outside it - so during the date range, no Rollout matching the
+# selector will advance.
 #
-# ClusterRolloutSchedule covers every Rollout selected by
-# namespaceSelector; this one freezes everything labeled
-# kuberik.com/freezable=true.
+# ClusterRolloutSchedule covers every Rollout in every namespace that
+# matches both rolloutSelector and namespaceSelector.
 ---
 apiVersion: kuberik.com/v1alpha1
 kind: ClusterRolloutSchedule
 metadata:
   name: christmas-freeze
 spec:
+  rolloutSelector:
+    matchLabels:
+      kuberik.com/freezable: "true"
   namespaceSelector:
     matchLabels:
       kuberik.com/freezable: "true"
   action: Deny
-  schedule:
-    - start: "2026-12-20T00:00:00Z"
-      end: "2026-12-27T00:00:00Z"
+  rules:
+    - dateRange:
+        start: "2026-12-20"
+        end: "2026-12-27"

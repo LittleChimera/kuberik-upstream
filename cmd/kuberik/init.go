@@ -40,11 +40,9 @@ The KIND must be one of: rollout, gate, schedule.`,
 			}
 			tmpl = fmt.Sprintf(gateTemplate, initName, namespace, rollout)
 		case "schedule":
-			rollout := initRollout
-			if rollout == "" {
-				rollout = initName
-			}
-			tmpl = fmt.Sprintf(scheduleTemplate, initName, namespace, rollout)
+			// The label value defaults to the schedule's name; Rollouts opt
+			// in by carrying that label.
+			tmpl = fmt.Sprintf(scheduleTemplate, initName, namespace, initName)
 		default:
 			return fmt.Errorf("unknown kind: %s", args[0])
 		}
@@ -83,16 +81,20 @@ metadata:
   name: %s
   namespace: %s
 spec:
-  rolloutRef:
-    name: %s
+  # Rollouts opt in by carrying a matching label. Change the selector
+  # below to whatever fits your Rollout labels.
+  rolloutSelector:
+    matchLabels:
+      kuberik.com/schedule: %s
   # Allow: open during the window, closed outside.
   # Deny:  closed during the window, open outside.
   action: Allow
-  schedule:
-    - days: [Mon, Tue, Wed, Thu, Fri]
-      start: "09:00"
-      end: "17:00"
-      timezone: "America/New_York"
+  timezone: "America/New_York"
+  rules:
+    - daysOfWeek: [Monday, Tuesday, Wednesday, Thursday, Friday]
+      timeRange:
+        start: "09:00"
+        end: "17:00"
 `
 
 func init() {

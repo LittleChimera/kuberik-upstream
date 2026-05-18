@@ -3,6 +3,8 @@
 # `action: Allow` means the gate is open during the window and closed
 # outside it - so promotions happen only between 9am and 5pm Eastern,
 # Monday through Friday.
+#
+# Rollouts opt in via the rolloutSelector label below.
 ---
 apiVersion: kuberik.com/v1alpha1
 kind: RolloutSchedule
@@ -10,11 +12,13 @@ metadata:
   name: business-hours-only
   namespace: production
 spec:
-  rolloutRef:
-    name: my-app
+  rolloutSelector:
+    matchLabels:
+      kuberik.com/schedule: business-hours-only
   action: Allow
-  schedule:
-    - days: [Mon, Tue, Wed, Thu, Fri]
-      start: "09:00"
-      end: "17:00"
-      timezone: "America/New_York"
+  timezone: "America/New_York"
+  rules:
+    - daysOfWeek: [Monday, Tuesday, Wednesday, Thursday, Friday]
+      timeRange:
+        start: "09:00"
+        end: "17:00"

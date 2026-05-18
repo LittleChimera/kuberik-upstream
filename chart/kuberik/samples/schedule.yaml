@@ -1,5 +1,8 @@
 # Sample RolloutSchedule: allow promotions only during business hours.
 # Outside the window, the auto-managed gate is closed.
+#
+# Rollouts opt in by carrying the label kuberik.com/schedule=business-hours
+# (or whichever selector you choose).
 ---
 apiVersion: kuberik.com/v1alpha1
 kind: RolloutSchedule
@@ -7,11 +10,13 @@ metadata:
   name: business-hours
   namespace: default
 spec:
-  rolloutRef:
-    name: my-app
+  rolloutSelector:
+    matchLabels:
+      kuberik.com/schedule: business-hours
   action: Allow
-  schedule:
-    - days: [Mon, Tue, Wed, Thu, Fri]
-      start: "09:00"
-      end: "17:00"
-      timezone: "America/New_York"
+  timezone: "America/New_York"
+  rules:
+    - daysOfWeek: [Monday, Tuesday, Wednesday, Thursday, Friday]
+      timeRange:
+        start: "09:00"
+        end: "17:00"
