@@ -128,6 +128,18 @@ kuberik logs --tail 500
 kuberik logs -f         # follow
 ```
 
+### `kuberik init`
+
+Scaffold a starter YAML manifest for a Kuberik resource. Writes to stdout so you can pipe it to a file or to `kubectl apply`.
+
+```bash
+kuberik init rollout --name webapp > rollout.yaml
+kuberik init gate --name webapp-approval -n production > gate.yaml
+kuberik init schedule --name business-hours > schedule.yaml
+```
+
+Available kinds: `rollout`, `gate`, `schedule`.
+
 ### `kuberik tree`
 
 Print a tree of every RolloutGate and HealthCheck that references a Rollout. Useful for spotting which gate is blocking promotion at a glance.
