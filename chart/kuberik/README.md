@@ -102,3 +102,40 @@ helm install kuberik ./chart/kuberik \
   --set integrations.openkruise.enabled=true \
   --set integrations.environment.enabled=true
 ```
+
+## Troubleshooting
+
+### `namespaces "kuberik-system" already exists` during install
+
+You used `helm install --create-namespace` while the chart also tried to create the namespace. Pick one:
+
+```bash
+# A) Let helm own the namespace
+helm install kuberik ./chart/kuberik \
+  --namespace kuberik-system --create-namespace \
+  --set createNamespace=false
+
+# B) Let the chart own the namespace
+helm install kuberik ./chart/kuberik \
+  --namespace kuberik-system
+```
+
+### `helm test` pod can't list deployments
+
+The default ServiceAccount in the namespace usually cannot list deployments. The chart's test pod uses `rollout-controller-controller-manager` by default, which has the necessary permissions. If you override `tests.serviceAccountName`, make sure it can `get`/`list`/`watch` Deployments.
+
+### Image pull failures for `rollout-controller`
+
+The chart defaults `rolloutController.image.tag` to `v` + `Chart.AppVersion`. If you are testing a fork with a non-`v`-prefixed tag, set the tag explicitly:
+
+```bash
+--set rolloutController.image.tag=0.7.0
+```
+
+### ServiceMonitor not picked up by Prometheus
+
+The ServiceMonitor lives in `.Values.namespace` by default. If your Prometheus Operator scrapes a different namespace, set:
+
+```bash
+--set metrics.serviceMonitor.namespace=monitoring
+```
