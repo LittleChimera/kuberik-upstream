@@ -138,9 +138,10 @@ jobs:
           kubectl apply -f examples/basic-rollout/rollout.yaml
           kubectl apply -f examples/with-gate/gate.yaml
           kubectl apply -f examples/with-schedule/schedule.yaml
+          kubectl apply -f examples/with-schedule/freeze.yaml
           kubectl apply -f examples/with-environments/environments.yaml
-          kubectl get rollout,rolloutgate,rolloutschedule,environment -A | \
-            grep -E 'my-app|business-hours|staging|production'
+          kubectl get rollout,rolloutgate,rolloutschedule,clusterrolloutschedule,environment -A | \
+            grep -E 'my-app|business-hours|christmas-freeze|staging|production'
       - name: Show installed resources
         if: always()
         run: |
