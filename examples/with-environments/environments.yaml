@@ -1,12 +1,13 @@
-# Multi-environment promotion: production only goes after staging.
+# Multi-environment promotion: production proceeds only after staging.
 #
-# environment-controller watches Environment resources, manages the
-# After/Parallel relationships, and creates RolloutGates that block
-# the downstream Rollout until upstream environments have deployed.
+# environment-controller reads each Environment's `relationship` and
+# creates a RolloutGate on the downstream Rollout that closes until
+# the upstream Environment reports a successful deployment via the
+# configured backend (GitHub Deployments in this example).
 #
-# Requires environment-controller installed.
+# Requires environment-controller installed (helm: integrations.environment.enabled=true).
 ---
-apiVersion: kuberik.com/v1alpha1
+apiVersion: environments.kuberik.com/v1alpha1
 kind: Environment
 metadata:
   name: staging
@@ -14,11 +15,14 @@ metadata:
 spec:
   rolloutRef:
     name: my-app
-  github:
-    repository: myorg/my-app
-    environment: staging
+  name: my-app-staging
+  environment: staging
+  backend:
+    type: github
+    project: myorg/my-app
+    secret: github-token
 ---
-apiVersion: kuberik.com/v1alpha1
+apiVersion: environments.kuberik.com/v1alpha1
 kind: Environment
 metadata:
   name: production
@@ -26,10 +30,13 @@ metadata:
 spec:
   rolloutRef:
     name: my-app
-  github:
-    repository: myorg/my-app
-    environment: production
-  # Production proceeds only after this Environment has deployed.
-  after:
-    - name: staging
-      namespace: staging
+  name: my-app-production
+  environment: production
+  backend:
+    type: github
+    project: myorg/my-app
+    secret: github-token
+  # Production proceeds only after staging finishes deploying.
+  relationship:
+    type: After
+    environment: staging
