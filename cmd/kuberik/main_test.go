@@ -11,7 +11,7 @@ func TestRootCommand(t *testing.T) {
 	want := []string{
 		"version", "install", "uninstall", "check", "get",
 		"approve", "reject", "completion",
-		"suspend", "resume", "describe", "logs", "events",
+		"suspend", "resume", "describe", "logs", "events", "tree",
 	}
 	for _, name := range want {
 		if _, _, err := rootCmd.Find([]string{name}); err != nil {
