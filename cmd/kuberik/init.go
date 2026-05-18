@@ -31,7 +31,7 @@ The KIND must be one of: rollout, gate, schedule.`,
 		var tmpl string
 		switch args[0] {
 		case "rollout":
-			tmpl = fmt.Sprintf(rolloutTemplate, initName, namespace, initImagePolicy, initImagePolicyNamespace, initBakeTime)
+			tmpl = fmt.Sprintf(rolloutTemplate, initName, namespace, initImagePolicy, initBakeTime)
 		case "gate":
 			tmpl = fmt.Sprintf(gateTemplate, initName, namespace, initName)
 		case "schedule":
@@ -52,9 +52,7 @@ metadata:
 spec:
   releasesImagePolicy:
     name: %s
-    namespace: %s
   versionHistoryLimit: 10
-  releaseUpdateInterval: 5m
   bakeTime: %s
 `
 
@@ -90,8 +88,8 @@ spec:
 
 func init() {
 	initCmd.Flags().StringVar(&initName, "name", "my-app", "Name to set in metadata.name")
-	initCmd.Flags().StringVar(&initImagePolicy, "image-policy", "my-app", "ImagePolicy name (Rollout only)")
-	initCmd.Flags().StringVar(&initImagePolicyNamespace, "image-policy-namespace", "flux-system", "ImagePolicy namespace (Rollout only)")
+	initCmd.Flags().StringVar(&initImagePolicy, "image-policy", "my-app", "ImagePolicy name (Rollout only). Must live in the same namespace as the Rollout in the current CRD; this flag stays for forward-compat.")
+	initCmd.Flags().StringVar(&initImagePolicyNamespace, "image-policy-namespace", "", "(unused) reserved for forward-compat")
 	initCmd.Flags().StringVar(&initBakeTime, "bake-time", "10m", "Bake duration (Rollout only)")
 	rootCmd.AddCommand(initCmd)
 }

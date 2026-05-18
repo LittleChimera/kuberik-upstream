@@ -68,9 +68,7 @@ metadata:
 spec:
   releasesImagePolicy:
     name: my-app
-    namespace: flux-system
   versionHistoryLimit: 10
-  releaseUpdateInterval: "5m"
   bakeTime: "10m"
 ```
 
