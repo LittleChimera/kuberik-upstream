@@ -108,7 +108,7 @@ jobs:
       - name: Verify rollout-controller is Available
         run: |
           kubectl wait --for=condition=Available --timeout=120s \
-            -n kuberik-system deployment -l app.kubernetes.io/name=rollout-controller
+            -n kuberik-system deployment/rollout-controller
       - name: Show installed resources
         if: always()
         run: |
