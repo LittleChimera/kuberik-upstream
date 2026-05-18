@@ -111,6 +111,16 @@ jobs:
             -n kuberik-system deployment/rollout-controller
       - name: Run helm test
         run: helm test kuberik --namespace kuberik-system --timeout 3m
+      - name: Apply chart sample manifests
+        # Confirm the CRDs the chart installed actually accept the
+        # sample manifests the chart ships in samples/.
+        run: |
+          set -euo pipefail
+          kubectl create namespace chart-samples
+          kubectl apply -n chart-samples -f chart/kuberik/samples/rollout.yaml
+          kubectl apply -n chart-samples -f chart/kuberik/samples/gate.yaml
+          kubectl apply -n chart-samples -f chart/kuberik/samples/schedule.yaml
+          kubectl get rollout,rolloutgate,rolloutschedule -n chart-samples
       - name: Show installed resources
         if: always()
         run: |
