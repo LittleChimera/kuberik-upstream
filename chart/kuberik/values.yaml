@@ -94,6 +94,15 @@ dashboard:
   image:
     repository: ghcr.io/kuberik/rollout-dashboard
     tag: ""
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      memory: 256Mi
+  nodeSelector: {}
+  tolerations: []
   ingress:
     enabled: false
     # Required when enabled. e.g. "dashboard.kuberik.example.com"
