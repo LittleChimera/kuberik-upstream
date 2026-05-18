@@ -138,6 +138,7 @@ Docs also available in this repo:
 - [Health Checks](docs/healthchecks.md) - bake-period validation signals
 - [Metrics](docs/metrics.md) - controller metrics and suggested alerts
 - [Migration Guide](docs/migration.md) - from Argo Rollouts, Flagger, or kubectl apply
+- [Upgrade Guide](docs/upgrade.md) - upgrade order, chart/controller compatibility, rollback
 - [Troubleshooting](docs/troubleshooting.md) - common issues and fixes
 - [Examples](examples/) - copy-pasteable manifests for common setups
 
