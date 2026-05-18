@@ -13,6 +13,7 @@ Reference for every workflow in this directory.
 | `chart-release.yaml` | push to main touching `chart/**` | Publish the Helm chart to `gh-pages` via chart-releaser |
 | `release.yaml` | push of `v*` tag | Goreleaser run: CLI binaries, Homebrew formula, ghcr.io images |
 | `sync-labels.yaml` | push to main touching `labels.yaml` | Apply `.github/labels.yaml` to issue/PR label set |
+| `pr-labeler.yaml` | PR opened / synchronize | Auto-apply `area/*` labels to PRs based on `.github/labeler.yml` path patterns |
 | `stale.yaml` | daily cron | Mark and close inactive issues / PRs |
 | `check-component-releases.yaml` | weekly cron | Diff pinned controller versions vs upstream; open tracking issue if behind |
 

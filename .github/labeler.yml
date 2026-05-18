@@ -1,0 +1,74 @@
+area/cli:
+  - changed-files:
+      - any-glob-to-any-file:
+          - cmd/**
+          - go.mod
+          - go.sum
+          - Makefile
+          - install/install.sh
+
+area/install:
+  - changed-files:
+      - any-glob-to-any-file:
+          - config/install/**
+
+area/docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.md'
+          - docs/**
+
+area/ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/workflows/**
+          - .github/labels.yaml
+          - .github/labeler.yml
+          - .markdownlint.json
+          - .golangci.yml
+          - .goreleaser.yml
+          - Dockerfile
+
+area/rollout-controller:
+  - changed-files:
+      - any-glob-to-any-file:
+          - chart/kuberik/templates/rollout-controller-*
+          - chart/kuberik/crds/rollouts.kuberik.com.yaml
+          - chart/kuberik/crds/rolloutgates.kuberik.com.yaml
+          - chart/kuberik/crds/healthchecks.kuberik.com.yaml
+          - chart/kuberik/crds/rolloutschedules.kuberik.com.yaml
+          - chart/kuberik/crds/clusterrolloutschedules.kuberik.com.yaml
+
+area/datadog:
+  - changed-files:
+      - any-glob-to-any-file:
+          - chart/kuberik/templates/integrations-datadog.yaml
+          - examples/with-datadog/**
+
+area/openkruise:
+  - changed-files:
+      - any-glob-to-any-file:
+          - chart/kuberik/templates/integrations-openkruise.yaml
+          - chart/kuberik/crds/rollouttests.rollout.kuberik.com.yaml
+
+area/environment:
+  - changed-files:
+      - any-glob-to-any-file:
+          - chart/kuberik/templates/integrations-environment.yaml
+          - chart/kuberik/crds/environments.environments.kuberik.com.yaml
+          - examples/with-environments/**
+
+area/prometheus:
+  - changed-files:
+      - any-glob-to-any-file:
+          - examples/with-prometheus/**
+
+area/rollout-dashboard:
+  - changed-files:
+      - any-glob-to-any-file:
+          - chart/kuberik/templates/dashboard*
+
+area/rfc:
+  - changed-files:
+      - any-glob-to-any-file:
+          - rfcs/**
