@@ -7,9 +7,9 @@ import (
 )
 
 var (
-	bootstrapAll       bool
-	bootstrapFluxOnly  bool
-	bootstrapVersion   string
+	bootstrapAll      bool
+	bootstrapFluxOnly bool
+	bootstrapVersion  string
 )
 
 const fluxImageReflectorURL = "https://github.com/fluxcd/flux2/releases/latest/download/install.yaml"

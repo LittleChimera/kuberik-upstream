@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	initName        string
-	initImagePolicy string
+	initName                 string
+	initImagePolicy          string
 	initImagePolicyNamespace string
-	initBakeTime    string
+	initBakeTime             string
 )
 
 var initCmd = &cobra.Command{
@@ -25,7 +25,7 @@ Examples:
   kuberik init schedule --name business-hours > schedule.yaml
 
 The KIND must be one of: rollout, gate, schedule.`,
-	Args: cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
+	Args:      cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
 	ValidArgs: []string{"rollout", "gate", "schedule"},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var tmpl string
