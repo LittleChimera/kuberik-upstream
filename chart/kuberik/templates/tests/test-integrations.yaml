@@ -1,0 +1,31 @@
+{{- $integrationDeployments := dict }}
+{{- if .Values.integrations.datadog.enabled }}{{ $_ := set $integrationDeployments "datadog" "datadog-controller-controller-manager" }}{{ end }}
+{{- if .Values.integrations.openkruise.enabled }}{{ $_ := set $integrationDeployments "openkruise" "openkruise-controller-manager" }}{{ end }}
+{{- if .Values.integrations.environment.enabled }}{{ $_ := set $integrationDeployments "environment" "environment-controller-manager" }}{{ end }}
+{{- range $key, $deploy := $integrationDeployments }}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "kuberik.fullname" $ }}-test-{{ $key }}"
+  namespace: {{ $.Values.namespace }}
+  labels:
+    {{- include "kuberik.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: test-{{ $key }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  serviceAccountName: {{ default "rollout-controller-controller-manager" $.Values.tests.serviceAccountName }}
+  containers:
+    - name: kubectl
+      image: registry.k8s.io/kubectl:v1.31.0
+      args:
+        - wait
+        - --for=condition=Available
+        - --timeout=120s
+        - -n
+        - {{ $.Values.namespace }}
+        - deployment/{{ $deploy }}
+{{- end }}
