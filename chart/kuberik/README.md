@@ -45,8 +45,32 @@ helm install kuberik ./chart/kuberik \
 | `integrations.openkruise.enabled` | `false` | Install openkruise-controller |
 | `integrations.environment.enabled` | `false` | Install environment-controller |
 | `dashboard.enabled` | `false` | Install rollout-dashboard |
+| `dashboard.ingress.enabled` | `false` | Expose the dashboard via an Ingress |
+| `dashboard.ingress.host` | `""` | Required when ingress is enabled |
+| `metrics.serviceMonitor.enabled` | `false` | Prometheus Operator ServiceMonitor for the rollout-controller |
+| `networkPolicy.enabled` | `false` | Restrict ingress/egress for the controller pods |
+| `rolloutController.podDisruptionBudget.enabled` | `false` | Emit a PDB (requires replicas > 1) |
+| `createNamespace` | `true` | Have the chart create the Namespace. Set false when using `helm install --create-namespace` |
 
 See [values.yaml](values.yaml) for the full schema.
+
+## Common scenarios
+
+### Production (HA, hardened, metrics, ingress)
+
+```bash
+helm install kuberik ./chart/kuberik \
+  --namespace kuberik-system --create-namespace \
+  --set createNamespace=false \
+  --set rolloutController.replicas=3 \
+  --set rolloutController.podDisruptionBudget.enabled=true \
+  --set metrics.serviceMonitor.enabled=true \
+  --set networkPolicy.enabled=true \
+  --set dashboard.enabled=true \
+  --set dashboard.ingress.enabled=true \
+  --set dashboard.ingress.host=dashboard.kuberik.example.com \
+  --set dashboard.ingress.className=nginx
+```
 
 ## Uninstall
 
