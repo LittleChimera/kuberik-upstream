@@ -11,7 +11,7 @@ metadata:
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   restartPolicy: Never
-  serviceAccountName: {{ default "default" .Values.tests.serviceAccountName }}
+  serviceAccountName: {{ default "rollout-controller-controller-manager" .Values.tests.serviceAccountName }}
   containers:
     - name: kubectl
       image: bitnami/kubectl:1.31
@@ -23,7 +23,5 @@ spec:
         - --timeout=120s
         - -n
         - {{ .Values.namespace }}
-        - deployment
-        - -l
-        - app.kubernetes.io/name=rollout-controller
+        - deployment/rollout-controller
 {{- end }}

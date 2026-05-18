@@ -106,9 +106,9 @@ affinity: {}
 
 # Settings for `helm test` resources.
 tests:
-  # ServiceAccount to run helm test pods. The default ServiceAccount in
-  # most namespaces cannot list deployments; override with a SA bound to
-  # the rollout-controller-rollout-viewer-role for the test to succeed.
+  # ServiceAccount the helm test pod runs under. Defaults to the
+  # rollout-controller's SA, which already has list-deployment access
+  # via the manager ClusterRole. Override if you want isolation.
   serviceAccountName: ""
 
 # Hardened NetworkPolicy for the controller pods. Off by default - turn
