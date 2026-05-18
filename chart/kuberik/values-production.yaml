@@ -1,0 +1,83 @@
+# Opinionated production overrides for the kuberik chart.
+#
+#   helm install kuberik oci://ghcr.io/kuberik/charts/kuberik \
+#     --namespace kuberik-system --create-namespace \
+#     -f values-production.yaml
+#
+# Tweak the dashboard.ingress.host and metrics.serviceMonitor.namespace
+# values to fit your cluster before applying.
+
+# Helm owns the namespace; chart skips its own Namespace template.
+createNamespace: false
+
+# PSA: restricted enforce + audit; the controllers run as non-root with
+# read-only rootfs and dropped capabilities, so restricted works.
+podSecurityAdmission:
+  enforce: restricted
+  audit: restricted
+  warn: restricted
+
+rolloutController:
+  replicas: 3
+  resources:
+    requests: { cpu: 100m, memory: 128Mi }
+    limits:   { memory: 512Mi }
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+  priorityClassName: system-cluster-critical
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: rollout-controller
+          control-plane: controller-manager
+
+metrics:
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+    # Restrict scrape to the monitoring namespace; require its
+    # namespaceSelector to match the Prometheus Operator's deployment.
+    namespace: monitoring
+
+networkPolicy:
+  enabled: true
+  metricsScrapeFrom:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: monitoring
+
+# Datadog + Prometheus + environment-controller. Enable openkruise only
+# if you actually use OpenKruise's strategy types.
+integrations:
+  datadog:
+    enabled: true
+  prometheus:
+    enabled: false  # no upstream release; install from source if needed
+  openkruise:
+    enabled: false
+  environment:
+    enabled: true
+
+# Expose the dashboard via Ingress with TLS. Replace the host below.
+dashboard:
+  enabled: true
+  ingress:
+    enabled: true
+    host: dashboard.kuberik.example.com
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    tls:
+      - hosts: [dashboard.kuberik.example.com]
+        secretName: kuberik-dashboard-tls
+
+# Cost-allocation / GitOps source labels applied to every chart-managed
+# resource.
+commonLabels:
+  team: platform
+  source: gitops

@@ -15,19 +15,29 @@ The chart installs:
 
 ## Install
 
+### gh-pages helm repo
+
 ```bash
-helm repo add kuberik https://kuberik.github.io/charts
+helm repo add kuberik https://kuberik.github.io/kuberik
+helm repo update
 helm install kuberik kuberik/kuberik \
-  --namespace kuberik-system \
-  --create-namespace
+  --namespace kuberik-system --create-namespace \
+  --set createNamespace=false
 ```
 
-Or from this directory directly:
+### OCI registry (Helm 3.8+)
+
+```bash
+helm install kuberik oci://ghcr.io/kuberik/charts/kuberik \
+  --namespace kuberik-system --create-namespace \
+  --set createNamespace=false
+```
+
+### From this directory directly
 
 ```bash
 helm install kuberik ./chart/kuberik \
-  --namespace kuberik-system \
-  --create-namespace
+  --namespace kuberik-system
 ```
 
 ## Values
