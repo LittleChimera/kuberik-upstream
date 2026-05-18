@@ -55,3 +55,32 @@ jobs:
           kuberik get rollouts -A
           kuberik get gates -A
           kuberik get healthchecks -A
+
+      - name: Apply a Rollout and Gate, exercise CLI
+        run: |
+          set -euo pipefail
+          kubectl create namespace e2e
+          kuberik init rollout --name e2e-app -n e2e > /tmp/ro.yaml
+          kuberik init gate --name e2e-gate -n e2e > /tmp/gate.yaml
+          kubectl apply -f /tmp/ro.yaml
+          kubectl apply -f /tmp/gate.yaml
+
+      - name: Verify the controller observes them
+        run: |
+          set -euo pipefail
+          # Rollout must exist and be reconciled (status object populated).
+          # tree command should list the gate we just created.
+          kubectl get rollout e2e-app -n e2e -o yaml
+          kuberik tree e2e-app -n e2e | tee /tmp/tree.txt
+          grep -q 'RolloutGate/e2e-gate' /tmp/tree.txt
+
+      - name: Exercise approve/reject/suspend/resume
+        run: |
+          set -euo pipefail
+          kuberik approve e2e-gate -n e2e
+          kubectl get rolloutgate e2e-gate -n e2e -o jsonpath='{.spec.passing}' | grep -q true
+          kuberik reject e2e-gate -n e2e
+          kubectl get rolloutgate e2e-gate -n e2e -o jsonpath='{.spec.passing}' | grep -q false
+          kuberik suspend e2e-app -n e2e
+          kubectl get rollout e2e-app -n e2e -o jsonpath='{.metadata.annotations.rollout\.kuberik\.com/suspended}' | grep -q true
+          kuberik resume e2e-app -n e2e
