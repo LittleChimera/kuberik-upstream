@@ -8,6 +8,16 @@ namespace: kuberik-system
 # if the namespace is managed outside the chart.
 createNamespace: true
 
+# Pod Security Admission labels applied to the chart-managed Namespace.
+# All three modes (enforce/audit/warn) accept "privileged", "baseline",
+# or "restricted". The controllers run as non-root with read-only
+# rootfs and dropped capabilities, so "restricted" is the safe choice.
+podSecurityAdmission:
+  enforce: ""  # e.g. "restricted"
+  audit: ""
+  warn: ""
+  version: ""  # e.g. "v1.31"; leaves cluster default if empty
+
 # Core rollout-controller settings. Always installed.
 rolloutController:
   enabled: true
@@ -37,6 +47,13 @@ rolloutController:
   # Scheduling controls for the rollout-controller pods.
   priorityClassName: ""
   topologySpreadConstraints: []
+  # Extra command-line args appended to /manager. Examples:
+  #   - "--reconcile-interval=30s"
+  #   - "--leader-elect-lease-duration=15s"
+  extraArgs: []
+  # Extra environment variables for the manager container. Standard
+  # corev1.EnvVar shape - supports valueFrom: { secretKeyRef|configMapKeyRef }.
+  extraEnv: []
 
 # Prometheus Operator ServiceMonitor for scraping controller metrics.
 metrics:

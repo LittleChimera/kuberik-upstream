@@ -5,4 +5,18 @@ metadata:
   name: {{ .Values.namespace | quote }}
   labels:
     {{- include "kuberik.labels" . | nindent 4 }}
+    {{- with .Values.podSecurityAdmission }}
+    {{- if .enforce }}
+    pod-security.kubernetes.io/enforce: {{ .enforce | quote }}
+    {{- if .version }}
+    pod-security.kubernetes.io/enforce-version: {{ .version | quote }}
+    {{- end }}
+    {{- end }}
+    {{- if .audit }}
+    pod-security.kubernetes.io/audit: {{ .audit | quote }}
+    {{- end }}
+    {{- if .warn }}
+    pod-security.kubernetes.io/warn: {{ .warn | quote }}
+    {{- end }}
+    {{- end }}
 {{- end }}

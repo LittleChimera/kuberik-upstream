@@ -36,6 +36,13 @@ spec:
             - --leader-elect
             - --health-probe-bind-address=:8081
             - --zap-log-level={{ .Values.rolloutController.logLevel }}
+            {{- with .Values.rolloutController.extraArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.rolloutController.extraEnv }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
             - name: metrics
               containerPort: 8443
