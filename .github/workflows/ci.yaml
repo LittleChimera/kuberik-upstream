@@ -122,6 +122,18 @@ jobs:
           kubectl apply -f chart/kuberik/samples/schedule.yaml
           kubectl apply -f chart/kuberik/samples/healthcheck.yaml
           kubectl get rollout,rolloutgate,rolloutschedule,healthcheck -n default
+
+      - name: Apply repo examples (basic-rollout, with-gate, with-schedule)
+        # Validates the user-facing examples render against the chart's CRDs.
+        # with-environments / with-datadog / with-prometheus need their own
+        # CRDs and are checked separately.
+        run: |
+          set -euo pipefail
+          kubectl apply -f examples/basic-rollout/rollout.yaml
+          kubectl apply -f examples/with-gate/gate.yaml
+          kubectl create namespace production --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f examples/with-schedule/schedule.yaml
+          kubectl get rollout,rolloutgate,rolloutschedule -A | grep -E 'my-app|business-hours'
       - name: Show installed resources
         if: always()
         run: |
