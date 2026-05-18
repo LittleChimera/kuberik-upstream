@@ -139,6 +139,8 @@ Docs also available in this repo:
 - [Metrics](docs/metrics.md) - controller metrics and suggested alerts
 - [Migration Guide](docs/migration.md) - from Argo Rollouts, Flagger, or kubectl apply
 - [Upgrade Guide](docs/upgrade.md) - upgrade order, chart/controller compatibility, rollback
+- [Operations Runbook](docs/operations.md) - day-2 ops, weekly/quarterly cadence, backups
+- [Security Hardening](docs/security-hardening.md) - production posture
 - [Troubleshooting](docs/troubleshooting.md) - common issues and fixes
 - [FAQ](docs/faq.md)
 - [Examples](examples/) - copy-pasteable manifests for common setups
