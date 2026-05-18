@@ -87,6 +87,10 @@ jobs:
 
   helm-install-kind:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [defaults, integrations]
     steps:
       - uses: actions/checkout@v4
       - name: Setup Helm
@@ -96,15 +100,25 @@ jobs:
       - name: Create kind cluster
         uses: helm/kind-action@v1
         with:
-          cluster_name: kuberik-helm
-      - name: Install chart with defaults
+          cluster_name: kuberik-helm-${{ matrix.profile }}
+      - name: Install chart (${{ matrix.profile }})
         # Use --create-namespace and disable the chart's namespace template
-        # so the two do not collide.
+        # so the two do not collide. The "integrations" profile enables
+        # datadog, openkruise, environment, and dashboard so all
+        # vendored deployments are exercised on a kind cluster.
         run: |
+          extra_flags=""
+          if [[ "${{ matrix.profile }}" == "integrations" ]]; then
+            extra_flags="--set integrations.datadog.enabled=true \
+              --set integrations.openkruise.enabled=true \
+              --set integrations.environment.enabled=true \
+              --set dashboard.enabled=true"
+          fi
           helm install kuberik chart/kuberik \
             --namespace kuberik-system --create-namespace \
             --set createNamespace=false \
-            --wait --timeout 3m
+            $extra_flags \
+            --wait --timeout 5m
       - name: Verify rollout-controller is Available
         run: |
           kubectl wait --for=condition=Available --timeout=120s \
