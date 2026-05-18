@@ -72,6 +72,10 @@ integrations:
     image:
       repository: ghcr.io/kuberik/datadog-controller
       tag: ""  # defaults to the version pinned by the template
+    replicas: 1
+    resources:
+      requests: { cpu: 10m, memory: 64Mi }
+      limits:   { cpu: 500m, memory: 128Mi }
   prometheus:
     enabled: false
     image:
@@ -82,11 +86,19 @@ integrations:
     image:
       repository: ghcr.io/kuberik/openkruise-controller
       tag: ""
+    replicas: 1
+    resources:
+      requests: { cpu: 10m, memory: 64Mi }
+      limits:   { cpu: 500m, memory: 128Mi }
   environment:
     enabled: false
     image:
       repository: ghcr.io/kuberik/environment-controller
       tag: ""
+    replicas: 1
+    resources:
+      requests: { cpu: 10m, memory: 64Mi }
+      limits:   { cpu: 500m, memory: 128Mi }
 
 # Optional dashboard (rollout-dashboard web UI).
 dashboard:

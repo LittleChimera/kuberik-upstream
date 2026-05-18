@@ -186,7 +186,7 @@ metadata:
   name: datadog-controller-controller-manager
   namespace: {{ .Values.namespace }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.integrations.datadog.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/name: datadog-controller
@@ -222,12 +222,7 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 10
         resources:
-          limits:
-            cpu: 500m
-            memory: 128Mi
-          requests:
-            cpu: 10m
-            memory: 64Mi
+          {{- toYaml .Values.integrations.datadog.resources | nindent 10 }}
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
