@@ -1,0 +1,75 @@
+name: check-component-releases
+on:
+  schedule:
+    # Every Monday at 06:00 UTC
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Diff pinned vs latest component releases
+        id: diff
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          REPORT=""
+          check() {
+            local repo=$1 pinned=$2
+            local latest
+            latest=$(gh api "repos/$repo/releases/latest" --jq .tag_name 2>/dev/null || echo "")
+            if [[ -z "$latest" || "$latest" == "$pinned" ]]; then
+              echo "$repo: $pinned (up to date)"
+            else
+              echo "$repo: $pinned -> $latest"
+              REPORT+=$'\n'"- **$repo**: \`$pinned\` -> \`$latest\`"
+            fi
+          }
+
+          # Versions pinned in config/install/kustomization.yaml
+          ROLLOUT=$(grep -oE 'rollout-controller/releases/download/v[0-9.]+' config/install/kustomization.yaml | head -1 | grep -oE 'v[0-9.]+')
+          OPENKRUISE=$(grep -oE 'openkruise-controller/releases/download/v[0-9.]+' config/install/kustomization.yaml | head -1 | grep -oE 'v[0-9.]+')
+          DATADOG=$(grep -oE 'datadog-controller/releases/download/v[0-9.]+' config/install/kustomization.yaml | head -1 | grep -oE 'v[0-9.]+')
+          ENVIRONMENT=$(grep -oE 'environment-controller/releases/download/v[0-9.]+' config/install/kustomization.yaml | head -1 | grep -oE 'v[0-9.]+')
+
+          check kuberik/rollout-controller "$ROLLOUT"
+          check kuberik/openkruise-controller "$OPENKRUISE"
+          check kuberik/datadog-controller "$DATADOG"
+          check kuberik/environment-controller "$ENVIRONMENT"
+
+          if [[ -n "$REPORT" ]]; then
+            {
+              echo 'report<<EOF'
+              echo 'New component releases available:'
+              echo "$REPORT"
+              echo ''
+              echo 'Bump the versions in `config/install/kustomization.yaml` and the matching templates in `chart/kuberik/templates/integrations-*.yaml`.'
+              echo 'EOF'
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open or update tracking issue
+        if: steps.diff.outputs.report != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BODY: ${{ steps.diff.outputs.report }}
+        run: |
+          set -euo pipefail
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --label "area/install" --state open \
+            --search "in:title Component versions out of date" --json number --jq '.[0].number' || echo "")
+          if [[ -n "$existing" ]]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$BODY"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "Component versions out of date" \
+              --label area/install,dependencies \
+              --body "$BODY"
+          fi

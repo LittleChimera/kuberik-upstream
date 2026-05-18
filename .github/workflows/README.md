@@ -14,6 +14,7 @@ Reference for every workflow in this directory.
 | `release.yaml` | push of `v*` tag | Goreleaser run: CLI binaries, Homebrew formula, ghcr.io images |
 | `sync-labels.yaml` | push to main touching `labels.yaml` | Apply `.github/labels.yaml` to issue/PR label set |
 | `stale.yaml` | daily cron | Mark and close inactive issues / PRs |
+| `check-component-releases.yaml` | weekly cron | Diff pinned controller versions vs upstream; open tracking issue if behind |
 
 ## Adding a workflow
 
