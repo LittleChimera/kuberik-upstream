@@ -107,6 +107,22 @@ nodeSelector: {}
 tolerations: []
 affinity: {}
 
+# Labels and annotations merged into every chart-managed resource. Useful
+# for cost-allocation tags, multi-tenant identifiers, GitOps source labels,
+# etc. Integration-controller resources vendored from upstream releases
+# are NOT affected (their labels stay matching the upstream selectors).
+commonLabels: {}
+commonAnnotations: {}
+
+# imagePullSecrets attached to the rollout-controller ServiceAccount.
+# Use this when the controller image lives in a private registry.
+# Integration controllers have their own SAs - attach secrets to those
+# separately via kubectl patch.
+imagePullSecrets: []
+# Example:
+# imagePullSecrets:
+#   - name: my-registry-creds
+
 # Settings for `helm test` resources.
 tests:
   # ServiceAccount the helm test pod runs under. Defaults to the

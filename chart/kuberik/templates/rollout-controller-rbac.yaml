@@ -8,6 +8,10 @@ metadata:
     app.kubernetes.io/name: rollout-controller
   name: rollout-controller-controller-manager
   namespace: {{ .Values.namespace }}
+{{- with .Values.imagePullSecrets }}
+imagePullSecrets:
+{{ toYaml . | indent 2 }}
+{{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
