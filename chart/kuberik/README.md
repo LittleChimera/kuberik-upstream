@@ -1,5 +1,8 @@
 # Kuberik Helm Chart
 
+[![helm](https://img.shields.io/badge/helm-kuberik.github.io%2Fkuberik-blue.svg)](https://kuberik.github.io/kuberik)
+[![oci](https://img.shields.io/badge/oci-ghcr.io%2Fkuberik%2Fcharts%2Fkuberik-blueviolet.svg)](https://github.com/kuberik/kuberik/pkgs/container/charts%2Fkuberik)
+
 A Helm chart that installs the Kuberik rollout-controller and optionally the integration controllers. Alternative to the [kustomize bundle](../../config/install/kustomization.yaml).
 
 The chart installs:

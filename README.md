@@ -66,13 +66,21 @@ kubectl apply -f https://github.com/kuberik/rollout-controller/releases/latest/d
 kuberik install --all
 # or, with kustomize
 kubectl apply -k https://github.com/kuberik/kuberik/config/install
-# or, with Helm
-helm install kuberik ./chart/kuberik \
+# or, with Helm (gh-pages repo)
+helm repo add kuberik https://kuberik.github.io/kuberik
+helm install kuberik kuberik/kuberik \
   --namespace kuberik-system --create-namespace \
+  --set createNamespace=false \
   --set integrations.datadog.enabled=true \
   --set integrations.openkruise.enabled=true \
   --set integrations.environment.enabled=true
+# or, with Helm (OCI registry, Helm 3.8+)
+helm install kuberik oci://ghcr.io/kuberik/charts/kuberik \
+  --namespace kuberik-system --create-namespace \
+  --set createNamespace=false
 ```
+
+See the [chart README](chart/kuberik/README.md) for the full values reference.
 
 See [Getting Started](docs/getting-started.md) for a step-by-step walkthrough and [Installation](https://kuberik.com/docs/installation/) for per-component install commands.
 
