@@ -48,6 +48,16 @@ sudo install bin/kuberik /usr/local/bin/
 
 ## Commands
 
+### `kuberik bootstrap`
+
+One-shot first-time install: Flux core (source, kustomize, image-reflector) followed by Kuberik.
+
+```bash
+kuberik bootstrap            # Flux core + Kuberik core
+kuberik bootstrap --all      # + all integration controllers
+kuberik bootstrap --flux=false   # Kuberik only (Flux already installed)
+```
+
 ### `kuberik install`
 
 Install Kuberik on the cluster the current kubeconfig points at.
