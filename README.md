@@ -143,6 +143,7 @@ Docs also available in this repo:
 - [Security Hardening](docs/security-hardening.md) - production posture
 - [Troubleshooting](docs/troubleshooting.md) - common issues and fixes
 - [FAQ](docs/faq.md)
+- [Cheatsheet](docs/cheatsheet.md) - one-page reference
 - [Examples](examples/) - copy-pasteable manifests for common setups
 
 ## Community and Contributing
