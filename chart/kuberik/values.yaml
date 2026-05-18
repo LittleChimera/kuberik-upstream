@@ -93,3 +93,13 @@ tests:
   # most namespaces cannot list deployments; override with a SA bound to
   # the rollout-controller-rollout-viewer-role for the test to succeed.
   serviceAccountName: ""
+
+# Hardened NetworkPolicy for the controller pods. Off by default - turn
+# on for clusters where namespace ingress/egress is restricted.
+networkPolicy:
+  enabled: false
+  # Override the metrics-scrape source. Default allows scraping from any
+  # namespace; tighten to a specific Prometheus namespace label in prod.
+  metricsScrapeFrom: []
+  # Extra egress rules (list of NetworkPolicyEgressRule) appended verbatim.
+  extraEgress: []

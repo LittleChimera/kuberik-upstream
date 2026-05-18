@@ -1,0 +1,61 @@
+{{- if .Values.networkPolicy.enabled }}
+# Hardened NetworkPolicy for the rollout-controller and integration controllers.
+# Allow:
+#   - Ingress from the Prometheus operator (selector configurable) to the
+#     metrics port for the controller pods.
+#   - Egress to the kube-apiserver (TCP 443/6443), DNS, and HTTPS to the
+#     internet for integration controllers to talk to Datadog/Prometheus.
+#
+# Default deny is implicit: pods not selected by this policy keep cluster
+# default behavior, but pods selected by it allow only what we list.
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kuberik-controllers
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kuberik.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchExpressions:
+      - key: control-plane
+        operator: In
+        values: [controller-manager]
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        {{- with .Values.networkPolicy.metricsScrapeFrom }}
+        {{- toYaml . | nindent 8 }}
+        {{- else }}
+        - namespaceSelector: {}
+        {{- end }}
+      ports:
+        - port: 8443
+          protocol: TCP
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # kube-apiserver (covers both kube-system endpoints and direct VIP)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except: []
+      ports:
+        - port: 443
+          protocol: TCP
+        - port: 6443
+          protocol: TCP
+    {{- with .Values.networkPolicy.extraEgress }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}
