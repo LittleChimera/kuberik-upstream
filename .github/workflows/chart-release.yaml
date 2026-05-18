@@ -47,6 +47,7 @@ jobs:
             helm registry login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Package and push chart to OCI registry
+        id: oci-push
         run: |
           set -euo pipefail
           version=$(grep '^version:' chart/kuberik/Chart.yaml | awk '{print $2}')
@@ -54,6 +55,25 @@ jobs:
           if helm show chart "oci://ghcr.io/kuberik/charts/kuberik" \
                --version "$version" >/dev/null 2>&1; then
             echo "kuberik chart $version already pushed to OCI; skipping"
+            echo "version=$version" >> "$GITHUB_OUTPUT"
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           helm push "/tmp/cr/kuberik-${version}.tgz" oci://ghcr.io/kuberik/charts
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Verify OCI artifact is pullable
+        # After push, immediately pull the chart back and helm template it
+        # to confirm the OCI artifact is well-formed and reachable from a
+        # fresh client. Catches publish-but-corrupt regressions.
+        run: |
+          set -euo pipefail
+          version=${{ steps.oci-push.outputs.version }}
+          mkdir -p /tmp/verify
+          helm pull oci://ghcr.io/kuberik/charts/kuberik \
+            --version "$version" --destination /tmp/verify
+          test -s "/tmp/verify/kuberik-${version}.tgz"
+          helm template oci-verify "/tmp/verify/kuberik-${version}.tgz" \
+            > /tmp/verify/render.yaml
+          grep -q '^kind: Deployment' /tmp/verify/render.yaml
