@@ -156,6 +156,19 @@ jobs:
           kubectl apply -f examples/with-environments/environments.yaml
           kubectl get rollout,rolloutgate,rolloutschedule,clusterrolloutschedule,environment -A | \
             grep -E 'my-app|business-hours|christmas-freeze|staging|production'
+      - name: Verify helm uninstall is clean
+        # Uninstall should leave no Deployments or Services in
+        # kuberik-system (CRDs intentionally remain - that's Helm's
+        # crds/ contract). Existing CRs survive too, which is fine.
+        run: |
+          set -euo pipefail
+          helm uninstall kuberik --namespace kuberik-system --wait --timeout 2m
+          if kubectl get deployment -n kuberik-system 2>/dev/null | grep -v 'No resources'; then
+            echo "expected no Deployments after uninstall"
+            exit 1
+          fi
+          # CRDs still here - that's correct.
+          kubectl get crd | grep kuberik.com
       - name: Show installed resources
         if: always()
         run: |
