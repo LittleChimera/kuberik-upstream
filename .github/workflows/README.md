@@ -4,7 +4,7 @@ Reference for every workflow in this directory.
 
 | Workflow | Trigger | Role |
 |---|---|---|
-| `ci.yaml` | push to main, PR | Build, vet, test, lint the CLI; validate kustomize install manifest; lint, template, and `helm install` the chart on kind |
+| `ci.yaml` | push to main, PR | Build/vet/test/lint CLI; validate kustomize install manifest; lint, template, `helm install`, and `helm upgrade` the chart on kind |
 | `e2e.yaml` | push to main, PR | Stand up a kind cluster, install Flux + Kuberik, run smoke tests |
 | `codeql.yaml` | push, PR, weekly | CodeQL static analysis of Go source |
 | `scorecard.yaml` | push to main, weekly | OpenSSF Scorecard security posture analysis |
