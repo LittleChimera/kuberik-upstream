@@ -1,0 +1,33 @@
+{{- if and .Values.dashboard.enabled .Values.dashboard.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rollout-dashboard
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kuberik.labels" . | nindent 4 }}
+    app.kubernetes.io/component: rollout-dashboard
+  {{- with .Values.dashboard.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.dashboard.ingress.className }}
+  ingressClassName: {{ . | quote }}
+  {{- end }}
+  rules:
+    - host: {{ required ".Values.dashboard.ingress.host is required when ingress is enabled" .Values.dashboard.ingress.host | quote }}
+      http:
+        paths:
+          - path: {{ .Values.dashboard.ingress.path }}
+            pathType: {{ .Values.dashboard.ingress.pathType }}
+            backend:
+              service:
+                name: rollout-dashboard
+                port:
+                  number: {{ .Values.dashboard.ingress.servicePort }}
+  {{- with .Values.dashboard.ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

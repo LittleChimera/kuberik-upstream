@@ -74,6 +74,23 @@ dashboard:
   image:
     repository: ghcr.io/kuberik/rollout-dashboard
     tag: ""
+  ingress:
+    enabled: false
+    # Required when enabled. e.g. "dashboard.kuberik.example.com"
+    host: ""
+    # IngressClass name; leave empty to use the cluster default.
+    className: ""
+    path: /
+    pathType: Prefix
+    # The Service port the Ingress backend targets (the dashboard listens
+    # on the port declared by its upstream Service - usually 80 or 3000).
+    servicePort: 80
+    annotations: {}
+    # tls is passed verbatim to spec.tls. Example:
+    #   tls:
+    #     - hosts: [dashboard.kuberik.example.com]
+    #       secretName: dashboard-tls
+    tls: []
 
 # Common pod settings applied to all controllers.
 podSecurityContext:
