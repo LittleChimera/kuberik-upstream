@@ -61,7 +61,7 @@ jobs:
           set -euo pipefail
           kubectl create namespace e2e
           kuberik init rollout --name e2e-app -n e2e > /tmp/ro.yaml
-          kuberik init gate --name e2e-gate -n e2e > /tmp/gate.yaml
+          kuberik init gate --name e2e-gate --rollout e2e-app -n e2e > /tmp/gate.yaml
           kubectl apply -f /tmp/ro.yaml
           kubectl apply -f /tmp/gate.yaml
 

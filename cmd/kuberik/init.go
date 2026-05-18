@@ -12,6 +12,7 @@ var (
 	initImagePolicy          string
 	initImagePolicyNamespace string
 	initBakeTime             string
+	initRollout              string
 )
 
 var initCmd = &cobra.Command{
@@ -33,9 +34,17 @@ The KIND must be one of: rollout, gate, schedule.`,
 		case "rollout":
 			tmpl = fmt.Sprintf(rolloutTemplate, initName, namespace, initImagePolicy, initBakeTime)
 		case "gate":
-			tmpl = fmt.Sprintf(gateTemplate, initName, namespace, initName)
+			rollout := initRollout
+			if rollout == "" {
+				rollout = initName
+			}
+			tmpl = fmt.Sprintf(gateTemplate, initName, namespace, rollout)
 		case "schedule":
-			tmpl = fmt.Sprintf(scheduleTemplate, initName, namespace, initName)
+			rollout := initRollout
+			if rollout == "" {
+				rollout = initName
+			}
+			tmpl = fmt.Sprintf(scheduleTemplate, initName, namespace, rollout)
 		default:
 			return fmt.Errorf("unknown kind: %s", args[0])
 		}
@@ -91,5 +100,6 @@ func init() {
 	initCmd.Flags().StringVar(&initImagePolicy, "image-policy", "my-app", "ImagePolicy name (Rollout only). Must live in the same namespace as the Rollout in the current CRD; this flag stays for forward-compat.")
 	initCmd.Flags().StringVar(&initImagePolicyNamespace, "image-policy-namespace", "", "(unused) reserved for forward-compat")
 	initCmd.Flags().StringVar(&initBakeTime, "bake-time", "10m", "Bake duration (Rollout only)")
+	initCmd.Flags().StringVar(&initRollout, "rollout", "", "Rollout name to reference (gate/schedule only). Defaults to --name.")
 	rootCmd.AddCommand(initCmd)
 }
