@@ -34,6 +34,9 @@ rolloutController:
     enabled: false
     minAvailable: ""
     maxUnavailable: ""
+  # Scheduling controls for the rollout-controller pods.
+  priorityClassName: ""
+  topologySpreadConstraints: []
 
 # Prometheus Operator ServiceMonitor for scraping controller metrics.
 metrics:
