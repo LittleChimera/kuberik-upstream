@@ -68,19 +68,15 @@ See [values.yaml](values.yaml) for the full schema.
 
 ### Production (HA, hardened, metrics, ingress)
 
+A complete opinionated overrides file ships with the chart at [values-production.yaml](values-production.yaml). Use as-is or as a starting point:
+
 ```bash
-helm install kuberik ./chart/kuberik \
+helm install kuberik oci://ghcr.io/kuberik/charts/kuberik \
   --namespace kuberik-system --create-namespace \
-  --set createNamespace=false \
-  --set rolloutController.replicas=3 \
-  --set rolloutController.podDisruptionBudget.enabled=true \
-  --set metrics.serviceMonitor.enabled=true \
-  --set networkPolicy.enabled=true \
-  --set dashboard.enabled=true \
-  --set dashboard.ingress.enabled=true \
-  --set dashboard.ingress.host=dashboard.kuberik.example.com \
-  --set dashboard.ingress.className=nginx
+  -f values-production.yaml
 ```
+
+The file enables: 3-replica rollout-controller with PDB and topology spread, `system-cluster-critical` priority, restricted PSA on the namespace, ServiceMonitor + NetworkPolicy, dashboard with TLS Ingress, Datadog and environment-controller integrations.
 
 ## Uninstall
 
