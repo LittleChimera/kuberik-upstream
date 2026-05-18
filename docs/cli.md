@@ -128,6 +128,14 @@ kuberik logs --tail 500
 kuberik logs -f         # follow
 ```
 
+### `kuberik tree`
+
+Print a tree of every RolloutGate and HealthCheck that references a Rollout. Useful for spotting which gate is blocking promotion at a glance.
+
+```bash
+kuberik tree my-app -n production
+```
+
 ### `kuberik events`
 
 Show Kubernetes events whose involved object is a Kuberik resource (Rollout, RolloutGate, HealthCheck, RolloutSchedule). Useful for diagnosing stuck rollouts.
