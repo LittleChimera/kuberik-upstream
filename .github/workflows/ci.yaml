@@ -120,7 +120,8 @@ jobs:
           kubectl apply -f chart/kuberik/samples/rollout.yaml
           kubectl apply -f chart/kuberik/samples/gate.yaml
           kubectl apply -f chart/kuberik/samples/schedule.yaml
-          kubectl get rollout,rolloutgate,rolloutschedule -n default
+          kubectl apply -f chart/kuberik/samples/healthcheck.yaml
+          kubectl get rollout,rolloutgate,rolloutschedule,healthcheck -n default
       - name: Show installed resources
         if: always()
         run: |

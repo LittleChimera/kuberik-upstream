@@ -14,6 +14,12 @@ func TestRootCommand(t *testing.T) {
 		"suspend", "resume", "describe", "logs", "events", "tree", "init",
 		"bootstrap",
 	}
+	// Init subkinds the user can pass.
+	for _, sub := range []string{"rollout", "gate", "schedule", "healthcheck"} {
+		if _, _, err := rootCmd.Find([]string{"init", sub}); err != nil {
+			t.Errorf("init %q not registered: %v", sub, err)
+		}
+	}
 	for _, name := range want {
 		if _, _, err := rootCmd.Find([]string{name}); err != nil {
 			t.Errorf("subcommand %q not registered: %v", name, err)

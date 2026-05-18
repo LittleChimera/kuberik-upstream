@@ -1,0 +1,13 @@
+# Sample HealthCheck written by hand. In production, integration
+# controllers (datadog, prometheus, custom) create these for you - the
+# label is what ties them to a Rollout's spec.healthCheckSelector.
+---
+apiVersion: kuberik.com/v1alpha1
+kind: HealthCheck
+metadata:
+  name: my-app-error-rate
+  namespace: default
+  labels:
+    app: my-app
+spec:
+  class: custom

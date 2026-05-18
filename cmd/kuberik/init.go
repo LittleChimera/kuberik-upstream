@@ -27,7 +27,7 @@ Examples:
 
 The KIND must be one of: rollout, gate, schedule.`,
 	Args:      cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
-	ValidArgs: []string{"rollout", "gate", "schedule"},
+	ValidArgs: []string{"rollout", "gate", "schedule", "healthcheck"},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var tmpl string
 		switch args[0] {
@@ -43,6 +43,12 @@ The KIND must be one of: rollout, gate, schedule.`,
 			// The label value defaults to the schedule's name; Rollouts opt
 			// in by carrying that label.
 			tmpl = fmt.Sprintf(scheduleTemplate, initName, namespace, initName)
+		case "healthcheck":
+			label := initRollout
+			if label == "" {
+				label = initName
+			}
+			tmpl = fmt.Sprintf(healthcheckTemplate, initName, namespace, label)
 		default:
 			return fmt.Errorf("unknown kind: %s", args[0])
 		}
@@ -73,6 +79,20 @@ spec:
     name: %s
   # Flip to true (e.g. via kuberik approve) when ready to promote.
   passing: false
+`
+
+const healthcheckTemplate = `apiVersion: kuberik.com/v1alpha1
+kind: HealthCheck
+metadata:
+  name: %s
+  namespace: %s
+  labels:
+    # The Rollout's spec.healthCheckSelector matches HealthChecks on labels.
+    # Set this to whatever your Rollout's selector picks up.
+    app: %s
+spec:
+  # Optional. Names the producer (e.g. datadog, prometheus, custom).
+  class: custom
 `
 
 const scheduleTemplate = `apiVersion: kuberik.com/v1alpha1

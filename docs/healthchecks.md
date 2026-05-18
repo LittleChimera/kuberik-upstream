@@ -12,9 +12,10 @@ kind: HealthCheck
 metadata:
   name: my-app-error-rate
   namespace: production
+  labels:
+    app: my-app          # Rollout's spec.healthCheckSelector matches on these labels
 spec:
-  rolloutRef:
-    name: my-app
+  class: datadog         # optional, names the producing integration
 status:
   healthy: true
   lastUpdateTime: "2026-05-17T12:34:56Z"
@@ -41,7 +42,7 @@ Key status fields:
 
 When a Rollout promotes a release, it enters the bake period (`spec.bakeTime`). During bake:
 
-1. The controller watches every `HealthCheck` whose `rolloutRef` points to this Rollout.
+1. The controller watches every `HealthCheck` whose labels match the Rollout's `spec.healthCheckSelector`.
 2. If any `HealthCheck.status.healthy` is `false` _or_ `lastErrorTime` is more recent than the bake start, the bake is failing.
 3. A failing bake either pauses the Rollout (default) or triggers a rollback (if `spec.rollbackOnFailedBake` is true).
 4. Once bake time elapses with no errors witnessed, the release is recorded in `status.versionHistory` and the next promotion can begin.
@@ -53,7 +54,7 @@ Because `lastErrorTime` survives recovery, a brief flap mid-bake will fail the b
 The minimum is a controller that:
 
 1. Watches some external signal (a metric, a probe, an SLO burn rate).
-2. Creates or updates a `HealthCheck` resource with `rolloutRef` set to the relevant Rollout.
+2. Creates or updates a `HealthCheck` resource carrying labels that match the target Rollout's `spec.healthCheckSelector`.
 3. Sets `status.healthy`, `status.lastUpdateTime`, and (when something goes wrong) `status.lastErrorTime`.
 
 Use the existing integration controllers as a reference - they are small Go programs that wrap a single external system in this shape.

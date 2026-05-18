@@ -144,11 +144,12 @@ Scaffold a starter YAML manifest for a Kuberik resource. Writes to stdout so you
 
 ```bash
 kuberik init rollout --name webapp > rollout.yaml
-kuberik init gate --name webapp-approval -n production > gate.yaml
+kuberik init gate --name webapp-approval --rollout webapp -n production > gate.yaml
 kuberik init schedule --name business-hours > schedule.yaml
+kuberik init healthcheck --name webapp-error-rate -n production > hc.yaml
 ```
 
-Available kinds: `rollout`, `gate`, `schedule`.
+Available kinds: `rollout`, `gate`, `schedule`, `healthcheck`.
 
 ### `kuberik tree`
 
