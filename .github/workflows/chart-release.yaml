@@ -31,7 +31,7 @@ jobs:
         with:
           version: v3.16.3
 
-      - name: Run chart-releaser
+      - name: Run chart-releaser (gh-pages helm repo)
         uses: helm/chart-releaser-action@v1.7.0
         with:
           charts_dir: chart
@@ -39,3 +39,20 @@ jobs:
           skip_existing: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Login to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | \
+            helm registry login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Package and push chart to OCI registry
+        run: |
+          set -euo pipefail
+          version=$(grep '^version:' chart/kuberik/Chart.yaml | awk '{print $2}')
+          helm package chart/kuberik --destination /tmp/cr
+          if helm show chart "oci://ghcr.io/kuberik/charts/kuberik" \
+               --version "$version" >/dev/null 2>&1; then
+            echo "kuberik chart $version already pushed to OCI; skipping"
+            exit 0
+          fi
+          helm push "/tmp/cr/kuberik-${version}.tgz" oci://ghcr.io/kuberik/charts
