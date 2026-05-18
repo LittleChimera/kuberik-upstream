@@ -123,17 +123,24 @@ jobs:
           kubectl apply -f chart/kuberik/samples/healthcheck.yaml
           kubectl get rollout,rolloutgate,rolloutschedule,healthcheck -n default
 
-      - name: Apply repo examples (basic-rollout, with-gate, with-schedule)
+      - name: Apply repo examples
         # Validates the user-facing examples render against the chart's CRDs.
-        # with-environments / with-datadog / with-prometheus need their own
-        # CRDs and are checked separately.
+        # The chart's crds/ dir installs every Kuberik CRD (including
+        # environments.kuberik.com from the openkruise/environment
+        # integrations), so we can validate them all without enabling
+        # the integration controllers. with-datadog/with-prometheus need
+        # third-party CRDs that we do not ship and are skipped here.
         run: |
           set -euo pipefail
+          for ns in production staging; do
+            kubectl create namespace "$ns" --dry-run=client -o yaml | kubectl apply -f -
+          done
           kubectl apply -f examples/basic-rollout/rollout.yaml
           kubectl apply -f examples/with-gate/gate.yaml
-          kubectl create namespace production --dry-run=client -o yaml | kubectl apply -f -
           kubectl apply -f examples/with-schedule/schedule.yaml
-          kubectl get rollout,rolloutgate,rolloutschedule -A | grep -E 'my-app|business-hours'
+          kubectl apply -f examples/with-environments/environments.yaml
+          kubectl get rollout,rolloutgate,rolloutschedule,environment -A | \
+            grep -E 'my-app|business-hours|staging|production'
       - name: Show installed resources
         if: always()
         run: |
