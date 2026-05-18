@@ -140,6 +140,7 @@ Docs also available in this repo:
 - [Migration Guide](docs/migration.md) - from Argo Rollouts, Flagger, or kubectl apply
 - [Upgrade Guide](docs/upgrade.md) - upgrade order, chart/controller compatibility, rollback
 - [Troubleshooting](docs/troubleshooting.md) - common issues and fixes
+- [FAQ](docs/faq.md)
 - [Examples](examples/) - copy-pasteable manifests for common setups
 
 ## Community and Contributing
