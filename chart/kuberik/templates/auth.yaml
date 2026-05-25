@@ -1,0 +1,174 @@
+{{- if .Values.auth.enabled }}
+{{- $auth := .Values.auth }}
+{{- if not $auth.oidc.issuerUrl }}{{ fail "auth.oidc.issuerUrl is required when auth.enabled is true" }}{{ end }}
+{{- if not $auth.canonicalHost }}{{ fail "auth.canonicalHost is required when auth.enabled is true (e.g. dashboard.kuberik.example.com)" }}{{ end }}
+{{- if not $auth.gateway.name }}{{ fail "auth.gateway.name is required when auth.enabled is true" }}{{ end }}
+{{- $cookieDomain := default $auth.canonicalHost $auth.cookieDomain }}
+{{- $redirectUrl := printf "https://%s/oauth2/callback" $auth.canonicalHost }}
+{{- $secretName := default (printf "%s-oauth2-proxy" (include "kuberik.name" .)) $auth.oidc.existingSecret }}
+{{- if not $auth.oidc.existingSecret }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $secretName }}
+  namespace: {{ $auth.namespace }}
+  labels:
+    {{- include "kuberik.labels" . | nindent 4 }}
+    app.kubernetes.io/component: auth-gate
+type: Opaque
+stringData:
+  client-secret: {{ required "auth.oidc.clientSecret is required when auth.oidc.existingSecret is empty" $auth.oidc.clientSecret | quote }}
+  # Cookie secret is regenerated on every helm upgrade. Pin it via
+  # existingSecret if you need stable sessions across redeploys.
+  cookie-secret: {{ randAlphaNum 32 | b64enc | quote }}
+---
+{{- end }}
+{{- $consumerNamespaces := default (list) $auth.allowedConsumerNamespaces }}
+{{- if and .Values.dashboard.enabled .Values.dashboard.gateway.enabled .Values.dashboard.gateway.auth }}
+{{- $consumerNamespaces = append $consumerNamespaces .Values.namespace }}
+{{- end }}
+{{- $consumerNamespaces = $consumerNamespaces | uniq }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oauth2-proxy
+  namespace: {{ $auth.namespace }}
+  labels:
+    {{- include "kuberik.labels" . | nindent 4 }}
+    app.kubernetes.io/component: auth-gate
+    app: oauth2-proxy
+spec:
+  replicas: {{ $auth.replicas }}
+  selector:
+    matchLabels:
+      app: oauth2-proxy
+  template:
+    metadata:
+      labels:
+        app: oauth2-proxy
+        app.kubernetes.io/component: auth-gate
+    spec:
+      containers:
+        - name: oauth2-proxy
+          image: {{ printf "%s:%s" $auth.image.repository $auth.image.tag | quote }}
+          imagePullPolicy: {{ $auth.image.pullPolicy }}
+          args:
+            - --provider=oidc
+            - --oidc-issuer-url={{ $auth.oidc.issuerUrl }}
+            - --client-id={{ $auth.oidc.clientId }}
+            - --redirect-url={{ $redirectUrl }}
+            - --scope={{- $scopes := concat (list "openid" "email" "profile" "groups") $auth.oidc.extraScopes }}{{- join " " $scopes }}
+            {{- range $auth.oidc.emailDomains }}
+            - --email-domain={{ . }}
+            {{- end }}
+            - --upstream=static://200
+            - --http-address=0.0.0.0:4180
+            - --set-authorization-header=true
+            - --pass-access-token=true
+            - --set-xauthrequest=true
+            - --skip-provider-button=true
+            - --cookie-secure=true
+            - --cookie-samesite=lax
+            - --cookie-domain={{ $cookieDomain }}
+            - --whitelist-domain={{ $cookieDomain }}
+            - --reverse-proxy=true
+            {{- if $auth.skipJwtBearerTokens }}
+            - --skip-jwt-bearer-tokens=true
+            {{- end }}
+            {{- if $auth.oidc.providerCaConfigMap }}
+            - --provider-ca-file=/etc/ssl/oidc/ca.crt
+            {{- end }}
+            {{- range $auth.extraArgs }}
+            - {{ . | quote }}
+            {{- end }}
+          env:
+            - name: OAUTH2_PROXY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName }}
+                  key: client-secret
+            - name: OAUTH2_PROXY_COOKIE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName }}
+                  key: cookie-secret
+          ports:
+            - containerPort: 4180
+          resources:
+            {{- toYaml $auth.resources | nindent 12 }}
+          {{- if $auth.oidc.providerCaConfigMap }}
+          volumeMounts:
+            - name: oidc-ca
+              mountPath: /etc/ssl/oidc
+              readOnly: true
+          {{- end }}
+      {{- if $auth.oidc.providerCaConfigMap }}
+      volumes:
+        - name: oidc-ca
+          configMap:
+            name: {{ $auth.oidc.providerCaConfigMap }}
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oauth2-proxy
+  namespace: {{ $auth.namespace }}
+  labels:
+    {{- include "kuberik.labels" . | nindent 4 }}
+    app.kubernetes.io/component: auth-gate
+spec:
+  selector:
+    app: oauth2-proxy
+  ports:
+    - port: 4180
+      targetPort: 4180
+---
+# /oauth2/* serves on every gateway hostname (no hostnames filter) so the 302
+# redirect from extAuth lands on the right subdomain regardless of which app
+# triggered it.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: oauth2-proxy
+  namespace: {{ $auth.namespace }}
+  labels:
+    {{- include "kuberik.labels" . | nindent 4 }}
+    app.kubernetes.io/component: auth-gate
+spec:
+  parentRefs:
+    - name: {{ $auth.gateway.name | quote }}
+      {{- with $auth.gateway.namespace }}
+      namespace: {{ . | quote }}
+      {{- end }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /oauth2
+      backendRefs:
+        - name: oauth2-proxy
+          port: 4180
+{{- range $ns := $consumerNamespaces }}
+---
+# Lets SecurityPolicies in {{ $ns }} reference oauth2-proxy in
+# {{ $auth.namespace }} as their extAuth backend.
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: oauth2-proxy-from-{{ $ns }}
+  namespace: {{ $auth.namespace }}
+  labels:
+    {{- include "kuberik.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: auth-gate
+spec:
+  from:
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: {{ $ns | quote }}
+  to:
+    - group: ""
+      kind: Service
+      name: oauth2-proxy
+{{- end }}
+{{- end }}

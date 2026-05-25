@@ -1,0 +1,9 @@
+{{- if and .Values.auth.enabled .Values.auth.createNamespace }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.auth.namespace | quote }}
+  labels:
+    {{- include "kuberik.labels" . | nindent 4 }}
+    app.kubernetes.io/component: auth-gate
+{{- end }}
