@@ -1,0 +1,58 @@
+{{- if and .Values.dashboard.enabled .Values.dashboard.gateway.enabled }}
+{{- $gw := .Values.dashboard.gateway }}
+{{- if not $gw.parentRef.name }}{{ fail "dashboard.gateway.parentRef.name is required when dashboard.gateway.enabled is true" }}{{ end }}
+{{- if not $gw.hostname }}{{ fail "dashboard.gateway.hostname is required when dashboard.gateway.enabled is true" }}{{ end }}
+{{- if and .Values.dashboard.ingress.enabled $gw.enabled }}{{ fail "Set either dashboard.ingress.enabled or dashboard.gateway.enabled, not both." }}{{ end }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: rollout-dashboard
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kuberik.labels" . | nindent 4 }}
+    app.kubernetes.io/component: rollout-dashboard
+spec:
+  parentRefs:
+    - name: {{ $gw.parentRef.name | quote }}
+      {{- with $gw.parentRef.namespace }}
+      namespace: {{ . | quote }}
+      {{- end }}
+  hostnames:
+    - {{ $gw.hostname | quote }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: rollout-dashboard
+          port: 80
+{{- if $gw.auth }}
+{{- if not .Values.auth.enabled }}{{ fail "dashboard.gateway.auth is true but auth.enabled is false" }}{{ end }}
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: rollout-dashboard-auth
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kuberik.labels" . | nindent 4 }}
+    app.kubernetes.io/component: rollout-dashboard
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: rollout-dashboard
+  extAuth:
+    http:
+      backendRefs:
+        - name: oauth2-proxy
+          namespace: {{ .Values.auth.namespace | quote }}
+          port: 4180
+      headersToBackend:
+        - Authorization
+        - X-Auth-Request-User
+        - X-Auth-Request-Email
+        - X-Auth-Request-Access-Token
+{{- end }}
+{{- end }}

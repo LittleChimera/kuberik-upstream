@@ -54,7 +54,65 @@
     },
     "dashboard": {
       "type": "object",
-      "properties": { "enabled": { "type": "boolean" } }
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "gateway": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "parentRef": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "namespace": { "type": "string" }
+              }
+            },
+            "hostname": { "type": "string" },
+            "auth": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "auth": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "namespace": { "type": "string" },
+        "createNamespace": { "type": "boolean" },
+        "replicas": { "type": "integer", "minimum": 1 },
+        "image": {
+          "type": "object",
+          "properties": {
+            "repository": { "type": "string" },
+            "tag": { "type": "string" },
+            "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] }
+          }
+        },
+        "oidc": {
+          "type": "object",
+          "properties": {
+            "issuerUrl": { "type": "string" },
+            "clientId": { "type": "string" },
+            "clientSecret": { "type": "string" },
+            "existingSecret": { "type": "string" },
+            "extraScopes": { "type": "array", "items": { "type": "string" } },
+            "emailDomains": { "type": "array", "items": { "type": "string" } },
+            "providerCaConfigMap": { "type": "string" }
+          }
+        },
+        "canonicalHost": { "type": "string" },
+        "cookieDomain": { "type": "string" },
+        "gateway": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "namespace": { "type": "string" }
+          }
+        },
+        "allowedConsumerNamespaces": { "type": "array", "items": { "type": "string" } },
+        "skipJwtBearerTokens": { "type": "boolean" },
+        "extraArgs": { "type": "array", "items": { "type": "string" } }
+      }
     },
     "metrics": {
       "type": "object",

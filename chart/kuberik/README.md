@@ -58,8 +58,18 @@ helm install kuberik ./chart/kuberik \
 | `integrations.openkruise.enabled` | `false` | Install openkruise-controller |
 | `integrations.environment.enabled` | `false` | Install environment-controller |
 | `dashboard.enabled` | `false` | Install rollout-dashboard |
-| `dashboard.ingress.enabled` | `false` | Expose the dashboard via an Ingress |
+| `dashboard.ingress.enabled` | `false` | Expose the dashboard via a `networking.k8s.io` Ingress |
 | `dashboard.ingress.host` | `""` | Required when ingress is enabled |
+| `dashboard.gateway.enabled` | `false` | Expose the dashboard via a Gateway API HTTPRoute (alternative to `ingress`) |
+| `dashboard.gateway.parentRef.name` | `""` | Gateway the HTTPRoute attaches to |
+| `dashboard.gateway.hostname` | `""` | Hostname the dashboard serves at |
+| `dashboard.gateway.auth` | `false` | Gate the HTTPRoute with the shared `auth` block via a SecurityPolicy |
+| `auth.enabled` | `false` | Install the cluster-level oauth2-proxy auth gate in its own namespace |
+| `auth.oidc.issuerUrl` | `""` | OIDC discovery URL of your IdP |
+| `auth.oidc.clientId` | `kuberik-cluster` | OAuth2 client id; also configure as kube-apiserver `--oidc-client-id` |
+| `auth.canonicalHost` | `""` | Host that owns the OAuth2 callback (`/oauth2/callback`) |
+| `auth.cookieDomain` | _canonicalHost_ | Cookie scope; set a parent domain to share session across subdomains |
+| `auth.gateway.name` | `""` | Gateway the `/oauth2/*` HTTPRoute attaches to |
 | `metrics.serviceMonitor.enabled` | `false` | Prometheus Operator ServiceMonitor for the rollout-controller |
 | `networkPolicy.enabled` | `false` | Restrict ingress/egress for the controller pods |
 | `rolloutController.podDisruptionBudget.enabled` | `false` | Emit a PDB (requires replicas > 1) |
@@ -101,6 +111,39 @@ kubectl delete crd \
 ```
 
 This also deletes every `Rollout`, `RolloutGate`, `HealthCheck`, `RolloutTest`, and `Environment` in the cluster.
+
+### OIDC-gated dashboard (Gateway API)
+
+Put the dashboard behind your OIDC provider via a shared oauth2-proxy in `auth-system`. Same audience works for kube-apiserver, so every dashboard action runs as the logged-in user under RBAC.
+
+```yaml {filename="auth-values.yaml"}
+dashboard:
+  enabled: true
+  gateway:
+    enabled: true
+    parentRef:
+      name: eg
+      namespace: envoy-gateway-system
+    hostname: dashboard.kuberik.example.com
+    auth: true
+
+auth:
+  enabled: true
+  oidc:
+    issuerUrl: https://idp.example.com
+    clientId: kuberik-cluster
+    clientSecret: <your-oidc-client-secret>  # or set existingSecret
+  canonicalHost: dashboard.kuberik.example.com
+  cookieDomain: .example.com
+  gateway:
+    name: eg
+    namespace: envoy-gateway-system
+```
+
+Set kube-apiserver flags:
+`--oidc-issuer-url=https://idp.example.com --oidc-client-id=kuberik-cluster --oidc-username-claim=email`
+
+To gate another service later, add its namespace to `auth.allowedConsumerNamespaces` and apply a `SecurityPolicy` in that namespace pointing at `oauth2-proxy.auth-system:4180`.
 
 ## Enabling everything
 

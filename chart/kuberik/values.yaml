@@ -132,6 +132,88 @@ dashboard:
     #     - hosts: [dashboard.kuberik.example.com]
     #       secretName: dashboard-tls
     tls: []
+  # Gateway API alternative to .ingress. Emits an HTTPRoute (and, when
+  # gateway.auth is true and the cluster auth gate is enabled below, a
+  # SecurityPolicy that gates the dashboard via oauth2-proxy).
+  # Mutually exclusive with .ingress.
+  gateway:
+    enabled: false
+    parentRef:
+      # Gateway to attach the HTTPRoute to. e.g. name: eg, namespace: envoy-gateway-system
+      name: ""
+      namespace: ""
+    # Hostname the dashboard serves at. e.g. "dashboard.kuberik.example.com"
+    hostname: ""
+    # When true, also emit a SecurityPolicy that routes every request
+    # through .Values.auth.* via extAuth. Requires auth.enabled.
+    auth: false
+
+# Cluster-level OIDC auth gate. Installs oauth2-proxy in its own namespace
+# as shared infrastructure; any HTTPRoute (the dashboard above, plus anything
+# else you put on the same Gateway) can opt in via a SecurityPolicy that
+# references it through the ReferenceGrants emitted alongside.
+#
+# The auth gate is dashboard-agnostic - oauth2-proxy never sees upstream
+# backends. To put the dashboard behind it, also set:
+#   dashboard.gateway.enabled: true
+#   dashboard.gateway.auth: true
+auth:
+  enabled: false
+  # Namespace for the shared auth infrastructure. Defaults to auth-system.
+  namespace: auth-system
+  # Have the chart emit the auth namespace. Set false if you manage it
+  # outside the chart (Argo CD, separate kustomize, etc.).
+  createNamespace: true
+  image:
+    repository: quay.io/oauth2-proxy/oauth2-proxy
+    tag: v7.7.1
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests: { cpu: 10m, memory: 64Mi }
+    limits:   { cpu: 200m, memory: 128Mi }
+  # OIDC client config. The same clientId should also be configured as
+  # kube-apiserver's --oidc-client-id so the dashboard's id_token authenticates
+  # against both oauth2-proxy and the API server with one audience.
+  oidc:
+    issuerUrl: ""              # e.g. https://your-idp.example.com
+    clientId: kuberik-cluster
+    # Either set clientSecret inline (NOT recommended for production - it
+    # ends up in the rendered manifest) or point to an existing Secret with
+    # `client-secret` and `cookie-secret` keys.
+    clientSecret: ""
+    existingSecret: ""
+    # Extra OAuth2 scopes appended to "openid email profile groups".
+    extraScopes: []
+    # Restrict accepted email domains. Use ["*"] for any.
+    emailDomains: ["*"]
+    # Trust the OIDC provider's CA (when self-signed). Provide the name of
+    # a ConfigMap in .Values.auth.namespace with a `ca.crt` key.
+    providerCaConfigMap: ""
+  # Canonical host that owns the OAuth2 callback URI - the only one the
+  # OIDC provider needs registered as a redirect URI. All gated subdomains
+  # share the session via .cookieDomain.
+  canonicalHost: ""
+  # Cookie scope. Defaults to canonicalHost. Set to a parent domain
+  # (".example.com") so subdomains share the session.
+  cookieDomain: ""
+  # The Gateway the /oauth2/* HTTPRoute attaches to. Usually the same one
+  # the dashboard uses. The HTTPRoute matches on every gateway hostname
+  # so the 302 redirect lands on whichever subdomain triggered the flow.
+  gateway:
+    name: ""
+    namespace: ""
+  # Namespaces whose SecurityPolicies are allowed to extAuth-reference
+  # oauth2-proxy in this namespace. Emits one ReferenceGrant per entry.
+  # The chart auto-adds .Values.namespace when dashboard.gateway.auth is true.
+  allowedConsumerNamespaces: []
+  # Accept JWT bearer tokens signed by the configured issuer without a
+  # session cookie. Required for multi-cluster hub->spoke fan-out and any
+  # programmatic caller that already holds an id_token.
+  skipJwtBearerTokens: true
+  # Extra command-line args appended to oauth2-proxy. Useful for tweaks
+  # like --whitelist-domain, --upstream-timeout, etc.
+  extraArgs: []
 
 # Common pod settings applied to all controllers.
 podSecurityContext:
