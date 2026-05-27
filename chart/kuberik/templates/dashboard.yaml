@@ -1,4 +1,25 @@
 {{- if .Values.dashboard.enabled }}
+{{- if or .Values.dashboard.clusterName .Values.dashboard.url .Values.dashboard.hubUrl .Values.dashboard.insecureSkipTLSVerify }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kuberik-cluster-info
+  namespace: {{ .Values.namespace }}
+data:
+  {{- if .Values.dashboard.clusterName }}
+  name: {{ .Values.dashboard.clusterName | quote }}
+  {{- end }}
+  {{- if .Values.dashboard.url }}
+  url: {{ .Values.dashboard.url | quote }}
+  {{- end }}
+  {{- if .Values.dashboard.hubUrl }}
+  hubUrl: {{ .Values.dashboard.hubUrl | quote }}
+  {{- end }}
+  {{- if .Values.dashboard.insecureSkipTLSVerify }}
+  insecureSkipTLSVerify: "true"
+  {{- end }}
+---
+{{- end }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -119,6 +140,31 @@ spec:
           name: rollout-dashboard
           ports:
             - containerPort: 8080
+          env:
+            - name: CLUSTER_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: kuberik-cluster-info
+                  key: name
+                  optional: true
+            - name: DASHBOARD_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: kuberik-cluster-info
+                  key: url
+                  optional: true
+            - name: HUB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: kuberik-cluster-info
+                  key: hubUrl
+                  optional: true
+            - name: INSECURE_SKIP_TLS_VERIFY
+              valueFrom:
+                configMapKeyRef:
+                  name: kuberik-cluster-info
+                  key: insecureSkipTLSVerify
+                  optional: true
           resources:
             {{- toYaml .Values.dashboard.resources | nindent 12 }}
       serviceAccountName: rollout-dashboard

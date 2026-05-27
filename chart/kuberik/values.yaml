@@ -115,6 +115,16 @@ dashboard:
       memory: 256Mi
   nodeSelector: {}
   tolerations: []
+  # Multi-cluster fan-out. The dashboard auto-discovers spoke URLs from
+  # Environment.status.environmentInfos[].environmentUrl — no config needed
+  # for zero-config discovery. Set these to assist self-identification behind
+  # reverse proxies or to designate this instance as a spoke.
+  # When any field is set the chart creates a kuberik-cluster-info ConfigMap.
+  clusterName: ""  # Display name shown in the hub UI (derived from url when empty)
+  url: ""          # External base URL of this dashboard; e.g. https://dashboard.example.com
+  hubUrl: ""       # Hub dashboard URL. When set this instance acts as a spoke and
+                   # redirects UI traffic to the hub.
+  insecureSkipTLSVerify: false  # Skip TLS for hub→spoke calls (dev / self-signed only)
   ingress:
     enabled: false
     # Required when enabled. e.g. "dashboard.kuberik.example.com"
