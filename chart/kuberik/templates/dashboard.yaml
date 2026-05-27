@@ -136,7 +136,7 @@ spec:
         app: rollout-dashboard
     spec:
       containers:
-        - image: {{ printf "%s:%s" .Values.dashboard.image.repository (.Values.dashboard.image.tag | default "v0.8.2") | quote }}
+        - image: {{ printf "%s:%s" .Values.dashboard.image.repository (.Values.dashboard.image.tag | default "v0.8.3") | quote }}
           name: rollout-dashboard
           ports:
             - containerPort: 8080
