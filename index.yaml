@@ -3,6 +3,34 @@ entries:
   kuberik:
   - apiVersion: v2
     appVersion: 0.8.0
+    created: "2026-05-27T07:25:38.587915263Z"
+    description: Kubernetes-native progressive delivery. Installs the Kuberik rollout-controller
+      and optional integration controllers.
+    digest: 96efdf68d35f49dfec6cfcc71e3502d09eefb72c9fa6ac7bf5b72f497f2994be
+    home: https://kuberik.com
+    icon: https://raw.githubusercontent.com/kuberik/kuberik/main/logo.svg
+    keywords:
+    - kubernetes
+    - gitops
+    - progressive-delivery
+    - continuous-delivery
+    - rollout
+    maintainers:
+    - name: kuberik-maintainers
+      url: https://github.com/kuberik/kuberik/blob/main/MAINTAINERS
+    name: kuberik
+    sources:
+    - https://github.com/kuberik/kuberik
+    - https://github.com/kuberik/rollout-controller
+    - https://github.com/kuberik/datadog-controller
+    - https://github.com/kuberik/openkruise-controller
+    - https://github.com/kuberik/environment-controller
+    type: application
+    urls:
+    - https://github.com/kuberik/kuberik/releases/download/kuberik-0.5.1/kuberik-0.5.1.tgz
+    version: 0.5.1
+  - apiVersion: v2
+    appVersion: 0.8.0
     created: "2026-05-26T19:55:47.071679398Z"
     description: Kubernetes-native progressive delivery. Installs the Kuberik rollout-controller
       and optional integration controllers.
@@ -253,4 +281,4 @@ entries:
     urls:
     - https://github.com/kuberik/kuberik/releases/download/kuberik-0.2.0/kuberik-0.2.0.tgz
     version: 0.2.0
-generated: "2026-05-26T19:55:47.071713259Z"
+generated: "2026-05-27T07:25:38.587946159Z"
