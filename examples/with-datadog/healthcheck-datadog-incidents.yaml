@@ -1,0 +1,23 @@
+# A HealthCheck that goes unhealthy while a Datadog incident matching these
+# labels is open - independent of any specific monitor. Useful for blocking
+# rollouts during an active incident.
+#
+# Requires:
+#   - datadog-controller installed (kubectl apply -k https://github.com/kuberik/kuberik/config/install)
+#   - A secret with your Datadog api-key/app-key:
+#       kubectl create secret generic datadog-credentials \
+#         --from-literal=api-key=YOUR_API_KEY --from-literal=app-key=YOUR_APP_KEY
+---
+apiVersion: kuberik.com/v1alpha1
+kind: HealthCheck
+metadata:
+  name: payments-incidents-check
+  namespace: production
+  annotations:
+    # Comma-separated "key:value" labels. Incident must match all of them.
+    healthcheck.kuberik.com/datadog-incident-labels: "team:payments,env:prod"
+    healthcheck.kuberik.com/datadog-credentials-secret: "datadog-credentials"
+    # healthcheck.kuberik.com/datadog-site: "datadoghq.eu"
+    # healthcheck.kuberik.com/requeue-interval: "60s"
+spec:
+  class: datadog-incidents

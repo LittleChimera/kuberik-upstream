@@ -1,0 +1,22 @@
+# A HealthCheck that polls the Datadog API directly for a monitor's status.
+# No Datadog Operator or DatadogMonitor CRD required.
+#
+# Requires:
+#   - datadog-controller installed (kubectl apply -k https://github.com/kuberik/kuberik/config/install)
+#   - A secret with your Datadog api-key/app-key:
+#       kubectl create secret generic datadog-credentials \
+#         --from-literal=api-key=YOUR_API_KEY --from-literal=app-key=YOUR_APP_KEY
+---
+apiVersion: kuberik.com/v1alpha1
+kind: HealthCheck
+metadata:
+  name: my-app-error-rate
+  namespace: production
+  annotations:
+    # The Datadog monitor ID to poll (from the Datadog UI or API)
+    healthcheck.kuberik.com/datadog-monitor-id: "12345678"
+    healthcheck.kuberik.com/datadog-credentials-secret: "datadog-credentials"
+    # healthcheck.kuberik.com/datadog-site: "datadoghq.eu"
+    # healthcheck.kuberik.com/requeue-interval: "60s"
+spec:
+  class: datadog-api

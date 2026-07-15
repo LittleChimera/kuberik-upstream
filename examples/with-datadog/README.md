@@ -1,20 +1,40 @@
 # Rollout with Datadog Health Check
 
-Use a Datadog query monitor as a health signal for a Kuberik Rollout. While the monitor is OK, the bake period proceeds; if Datadog flips the monitor to Alert during bake, the rollout is paused.
+Use Datadog as a health signal for a Kuberik Rollout. While the signal is healthy, the bake period proceeds; if Datadog reports a problem during bake, the rollout is paused. The datadog-controller is installed either way (it ships in the install bundle, or apply only the integration controller from its release).
 
-## Prerequisites
+Three modes, pick one:
 
-- The datadog-controller is installed (it ships in the install bundle, or apply only the integration controller from its release).
-- Datadog Operator and the `DatadogMonitor` CRD are installed in the cluster.
-- The Datadog API key is configured for the Datadog Operator.
+| File | Mode | Requires Datadog Operator? |
+|------|------|------|
+| [monitor.yaml](monitor.yaml) | Annotate a `DatadogMonitor` CRD | Yes |
+| [healthcheck-datadog-api.yaml](healthcheck-datadog-api.yaml) | Poll a monitor via the Datadog API directly | No |
+| [healthcheck-datadog-incidents.yaml](healthcheck-datadog-incidents.yaml) | Go unhealthy while a labeled incident is open | No |
 
-## Apply
+## DatadogMonitor CRD
+
+Requires the Datadog Operator and `DatadogMonitor` CRD installed, with the Datadog API key configured for the operator.
 
 ```bash
 kubectl apply -f monitor.yaml
 ```
 
 The datadog-controller sees the `kuberik.com/health-check: "true"` annotation and creates a `HealthCheck` resource named `my-app-error-rate` mirroring the monitor's state.
+
+## Direct API Mode
+
+No Datadog Operator needed - the controller polls the Datadog API for an existing monitor's status. Requires a secret with your `api-key`/`app-key` (see file header).
+
+```bash
+kubectl apply -f healthcheck-datadog-api.yaml
+```
+
+## Incident-Based Mode
+
+Goes unhealthy while any open Datadog incident matches the given labels, independent of any specific monitor. Same credentials secret as direct API mode.
+
+```bash
+kubectl apply -f healthcheck-datadog-incidents.yaml
+```
 
 ## Wire it to your Rollout
 
