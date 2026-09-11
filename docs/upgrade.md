@@ -36,8 +36,10 @@ kubectl apply -f kuberik/crds/
 | 0.4.x | v0.7.0 | v0.1.0 | v0.3.3 | v0.1.5 | v0.7.7 |
 | 0.5.0 | v0.8.0 | v0.1.0 | v0.4.0 | v0.1.5 | v0.8.0 |
 | 0.5.1 | v0.8.0 | v0.1.0 | v0.4.0 | v0.1.5 | v0.8.2 |
-| 0.6.0 | v0.9.0 | v0.1.0 | v0.4.0 | v0.1.5 | v0.9.1 | (missing the RolloutDependency CRD and RBAC — use 0.6.1)
+| 0.6.0 | v0.9.0 | v0.1.0 | v0.4.0 | v0.1.5 | v0.9.1 |
 | 0.6.1 | v0.9.0 | v0.1.0 | v0.4.0 | v0.1.5 | v0.9.1 |
+
+> **Note:** Chart `0.6.0` is missing the `RolloutDependency` CRD and RBAC that rollout-controller v0.9.0 needs — use `0.6.1` instead.
 
 Always check the release notes of the chart version you are upgrading to for any deviations from this baseline.
 
