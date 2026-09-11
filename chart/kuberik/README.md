@@ -7,7 +7,7 @@ A Helm chart that installs the Kuberik rollout-controller and optionally the int
 
 The chart installs:
 
-- 7 CRDs (in `crds/` so Helm applies them before any template): Kuberik core + openkruise + environment.
+- 8 CRDs (in `crds/` so Helm applies them before any template): Kuberik core (incl. `RolloutDependency`, v0.9) + openkruise + environment.
 - rollout-controller: ServiceAccount, leader-election Role/RoleBinding, 10 ClusterRoles and 2 ClusterRoleBindings, metrics Service, Deployment.
 - Optional integration controllers (toggle in `values.yaml`):
   - **datadog-controller** - templated
@@ -107,6 +107,7 @@ kubectl delete crd \
   healthchecks.kuberik.com \
   rolloutschedules.kuberik.com \
   clusterrolloutschedules.kuberik.com \
+  rolloutdependencies.kuberik.com \
   rollouttests.rollout.kuberik.com \
   environments.environments.kuberik.com
 ```
